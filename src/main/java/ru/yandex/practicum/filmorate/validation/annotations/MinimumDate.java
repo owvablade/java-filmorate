@@ -15,7 +15,10 @@ import java.lang.annotation.Target;
 public @interface MinimumDate {
 
     String value() default "1895-12-28";
+
     String message() default "Date must not be before {value}";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

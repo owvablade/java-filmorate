@@ -5,17 +5,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.json.deserializers.DurationDeserializer;
 import ru.yandex.practicum.filmorate.json.serializers.DurationSerializer;
 import ru.yandex.practicum.filmorate.validation.annotations.MinimumDate;
 import ru.yandex.practicum.filmorate.validation.annotations.PositiveDuration;
 
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
 import java.time.Duration;
 import java.time.LocalDate;
 
