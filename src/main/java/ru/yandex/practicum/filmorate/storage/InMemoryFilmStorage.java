@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class InMemoryFilmStorage implements Storage<Film> {
 
-    private static int id;
-    private final Map<Integer, Film> filmStorage;
+    private static long id;
+    private final Map<Long, Film> filmStorage;
 
     public InMemoryFilmStorage() {
         filmStorage = new HashMap<>();

@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class InMemoryUserStorage implements Storage<User> {
 
-    private static int id;
-    private final Map<Integer, User> userStorage;
+    private static long id;
+    private final Map<Long, User> userStorage;
 
     public InMemoryUserStorage() {
         userStorage = new HashMap<>();

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.json.deserializers.DurationDeserializer;
 import ru.yandex.practicum.filmorate.json.serializers.DurationSerializer;
@@ -17,9 +18,10 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
+@Accessors(chain = true)
 public class Film {
 
-    private int id;
+    private Long id;
     @NotBlank
     private String name;
     @Length(max = 200, message = "Description length must be less than 200")
