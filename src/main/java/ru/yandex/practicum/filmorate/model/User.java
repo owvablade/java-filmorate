@@ -17,6 +17,7 @@ public class User {
 
     private Long id;
     @Email
+    @NotBlank
     private String email;
     @Setter(AccessLevel.NONE)
     @NotBlank
