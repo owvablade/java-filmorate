@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -11,6 +12,7 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 @Data
+@Accessors(chain = true)
 public class User {
 
     private Long id;
@@ -24,10 +26,11 @@ public class User {
     @Past
     private LocalDate birthday;
 
-    public void setLogin(String login) {
+    public User setLogin(String login) {
         this.login = login;
         if (this.name == null) {
             this.name = login;
         }
+        return this;
     }
 }
