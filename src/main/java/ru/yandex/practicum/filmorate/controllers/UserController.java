@@ -31,7 +31,7 @@ public class UserController {
     public User update(@Valid @RequestBody User user, HttpServletResponse response) {
         log.info("Invoke update user method at resource PUT /users = {}", user);
         if (storage.update(user) == null) {
-            log.info("Cannot update because user with id={} not found", user.getId());
+            log.warn("Cannot update because user with id={} not found", user.getId());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
         return user;

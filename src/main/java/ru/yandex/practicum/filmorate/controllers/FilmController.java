@@ -31,7 +31,7 @@ public class FilmController {
     public Film update(@Valid @RequestBody Film film, HttpServletResponse response) {
         log.info("Invoke update film method at resource PUT /films = {}", film);
         if (storage.update(film) == null) {
-            log.info("Cannot update because film with id={} not found", film.getId());
+            log.warn("Cannot update because film with id={} not found", film.getId());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
         return film;
