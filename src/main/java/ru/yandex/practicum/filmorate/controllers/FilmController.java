@@ -3,7 +3,8 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -14,7 +15,7 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
 
-    private final InMemoryFilmStorage storage;
+    private final FilmStorage storage;
 
     public FilmController() {
         storage = new InMemoryFilmStorage();
@@ -23,7 +24,7 @@ public class FilmController {
     @PostMapping
     public Film add(@Valid @RequestBody Film film) {
         log.info("Invoke add film method at resource POST /films = {}", film);
-        return storage.add(film);
+        return storage.create(film);
     }
 
     @PutMapping

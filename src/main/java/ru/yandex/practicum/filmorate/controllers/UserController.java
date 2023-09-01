@@ -3,7 +3,8 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -14,7 +15,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final InMemoryUserStorage storage;
+    private final UserStorage storage;
 
     public UserController() {
         storage = new InMemoryUserStorage();
@@ -23,7 +24,7 @@ public class UserController {
     @PostMapping
     public User add(@Valid @RequestBody User user) {
         log.info("Invoke add user method at resource POST /users = {}", user);
-        return storage.add(user);
+        return storage.create(user);
     }
 
     @PutMapping
