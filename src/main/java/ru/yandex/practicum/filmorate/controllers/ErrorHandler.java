@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exception.film.FilmAlreadyLikedByUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmHasNoLikeFromUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmNotFoundException;
@@ -33,6 +35,22 @@ public class ErrorHandler {
                 .map(FieldError::getField)
                 .collect(Collectors.toList());
         return new ErrorResponse(String.format("Invalid fields: %s", fieldErrors), 400);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
+        log.error("Path variable error", e);
+        return new ErrorResponse(String.format("Value '%s' is invalid for parameter '%s'", e.getValue(), e.getName()),
+                500);
+    }
+
+    @ExceptionHandler(IncorrectParameterException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
+        log.error("Parameter error", e);
+        return new ErrorResponse(String.format("Value for parameter %s is invalid", e.getParameter()),
+                500);
     }
 
     @ExceptionHandler({UserNotFoundException.class,
