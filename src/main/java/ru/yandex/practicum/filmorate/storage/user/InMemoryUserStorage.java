@@ -27,6 +27,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public User read(Long id) {
+        return userStorage.get(id);
+    }
+
+    @Override
     public User update(User user) {
         if (userStorage.replace(user.getId(), user) == null) {
             return null;

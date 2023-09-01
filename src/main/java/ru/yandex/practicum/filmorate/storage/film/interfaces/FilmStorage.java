@@ -8,6 +8,8 @@ public interface FilmStorage {
 
     Film create(Film film);
 
+    Film read(Long id);
+
     Film update(Film film);
 
     Film delete(Film film);

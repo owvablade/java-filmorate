@@ -8,6 +8,8 @@ public interface UserStorage {
 
     User create(User user);
 
+    User read(Long id);
+
     User update(User user);
 
     User delete(User user);

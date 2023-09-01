@@ -27,6 +27,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Film read(Long id) {
+        return filmStorage.get(id);
+    }
+
+    @Override
     public Film update(Film film) {
         if (filmStorage.replace(film.getId(), film) == null) {
             return null;
