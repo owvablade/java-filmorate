@@ -1,45 +1,36 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserStorage storage;
-
-    public UserController() {
-        storage = new InMemoryUserStorage();
-    }
+    private final UserService userService;
 
     @PostMapping
     public User add(@Valid @RequestBody User user) {
         log.info("Invoke add user method at resource POST /users = {}", user);
-        return storage.create(user);
+        return userService.createUser(user);
     }
 
     @PutMapping
-    @ResponseBody
-    public User update(@Valid @RequestBody User user, HttpServletResponse response) {
+    public User update(@Valid @RequestBody User user) {
         log.info("Invoke update user method at resource PUT /users = {}", user);
-        if (storage.update(user) == null) {
-            log.warn("Cannot update because user with id={} not found", user.getId());
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }
-        return user;
+        return userService.updateUser(user);
     }
 
     @GetMapping
     public List<User> getAll() {
-        return storage.getAll();
+        return userService.getAllUsers();
     }
 }
