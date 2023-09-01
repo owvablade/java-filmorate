@@ -21,7 +21,18 @@ public class UserService {
     private final UserStorage userStorage;
 
     public User createUser(User user) {
+        if (user.getName().isBlank() || user.getName() == null) {
+            user.setName(user.getLogin());
+        }
         return userStorage.create(user);
+    }
+
+    public User readUser(Long userId) {
+        User user = userStorage.read(userId);
+        if (user == null) {
+            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
+        }
+        return user;
     }
 
     public User updateUser(User user) {
@@ -53,7 +64,7 @@ public class UserService {
         friendUser.addFriend(userId);
     }
 
-    public void removeFriend(Long userId, Long friendId) {
+    public void deleteFriend(Long userId, Long friendId) {
         User user = userStorage.read(userId);
         User friendUser = userStorage.read(friendId);
         checkUsersExists(user, userId, friendUser, friendId);

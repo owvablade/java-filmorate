@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exception.film.FilmAlreadyLikedByUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmHasNoLikeFromUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmNotFoundException;
@@ -23,6 +24,14 @@ public class FilmService {
 
     public Film createFilm(Film film) {
         return filmStorage.create(film);
+    }
+
+    public Film readFilm(Long filmId) {
+        Film film = filmStorage.read(filmId);
+        if (film == null) {
+            throw new FilmNotFoundException(String.format("Film with id = %d not found", filmId));
+        }
+        return film;
     }
 
     public Film updateFilm(Film film) {
@@ -70,9 +79,12 @@ public class FilmService {
     }
 
     public List<Film> getTopNFilmsByLikes(int n) {
+        if (n <= 0) {
+            throw new IncorrectParameterException("count");
+        }
         return filmStorage.getAll()
                 .stream()
-                .sorted(Comparator.comparing(f -> f.getLikes().size()))
+                .sorted(Comparator.comparing(f -> f.getLikes().size(), Comparator.reverseOrder()))
                 .limit(n)
                 .collect(Collectors.toList());
     }
