@@ -17,16 +17,40 @@ public class FilmController {
 
     private final FilmService filmService;
 
+    @GetMapping("/{id}")
+    public Film get(@PathVariable Long id) {
+        log.info("Invoke get film method at resource GET /films with id={}", id);
+        return filmService.readFilm(id);
+    }
+
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        log.info("Invoke add film method at resource POST /films = {}", film);
+        log.info("Invoke add film method at resource POST /films={}", film);
         return filmService.createFilm(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
-        log.info("Invoke update film method at resource PUT /films = {}", film);
+        log.info("Invoke update film method at resource PUT /films={}", film);
         return filmService.updateFilm(film);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Invoke add like to film method at resource PUT /films/{}/like/{}", id, userId);
+        filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Invoke delete like to film method at resource PUT /films/{}/like/{}", id, userId);
+        filmService.deleteLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getMostPopular(@RequestParam(required = false, defaultValue = "10") Integer count) {
+        log.info("Invoke get most n popular film method at resource GET /films/popular?count={}", count);
+        return filmService.getTopNFilmsByLikes(count);
     }
 
     @GetMapping
