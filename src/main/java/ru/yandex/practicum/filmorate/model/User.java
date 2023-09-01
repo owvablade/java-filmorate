@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -28,13 +29,13 @@ public class User {
     @Past(message = "Date of birth must be earlier than today")
     private LocalDate birthday;
     @Setter(AccessLevel.NONE)
-    private Set<Long> friends;
+    private final Set<Long> friends = new HashSet<>();
 
     public User setLogin(String login) {
-        this.login = login;
-        if (this.name == null) {
+        if (this.name == null || this.name.isBlank()) {
             this.name = login;
         }
+        this.login = login;
         return this;
     }
 

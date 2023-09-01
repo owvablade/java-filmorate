@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.validation.annotations.PositiveDuration;
 import javax.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -37,7 +38,7 @@ public class Film {
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration duration;
     @Setter(AccessLevel.NONE)
-    private Set<Long> likes;
+    private Set<Long> likes = new HashSet<>();
 
     public void addLike(Long userId) {
         likes.add(userId);
