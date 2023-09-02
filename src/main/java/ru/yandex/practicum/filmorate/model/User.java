@@ -5,10 +5,7 @@ import lombok.Data;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +23,8 @@ public class User {
     @Pattern(regexp = "^\\S+$", message = "Login must not contain whitespaces")
     private String login;
     private String name;
-    @Past(message = "Date of birth must be earlier than today")
+    @NotNull
+    @PastOrPresent(message = "Date of birth must be earlier than today")
     private LocalDate birthday;
     @Setter(AccessLevel.NONE)
     private final Set<Long> friends = new HashSet<>();
