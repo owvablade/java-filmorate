@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exception.film.FilmAlreadyLikedByUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmHasNoLikeFromUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmNotFoundException;
@@ -27,11 +26,8 @@ public class FilmService {
     }
 
     public Film readFilm(Long filmId) {
-        Film film = filmStorage.read(filmId);
-        if (film == null) {
-            throw new FilmNotFoundException(String.format("Film with id = %d not found", filmId));
-        }
-        return film;
+        return filmStorage.read(filmId)
+                .orElseThrow(() -> new FilmNotFoundException(String.format("Film with id = %d not found", filmId)));
     }
 
     public Film updateFilm(Film film) {
@@ -49,13 +45,10 @@ public class FilmService {
     }
 
     public void addLike(Long filmId, Long userId) {
-        if (userStorage.read(userId) == null) {
+        if (userStorage.read(userId).isEmpty()) {
             throw new UserNotFoundException(String.format("User with id = %d not found", userId));
         }
-        Film film = filmStorage.read(filmId);
-        if (film == null) {
-            throw new FilmNotFoundException(String.format("Film with id = %d not found", filmId));
-        }
+        Film film = readFilm(filmId);
         if (film.containsLike(userId)) {
             throw new FilmAlreadyLikedByUserException(String.format("Film with id = %d " +
                     "already has like from user with id = %d", filmId, userId));
@@ -64,13 +57,10 @@ public class FilmService {
     }
 
     public void deleteLike(Long filmId, Long userId) {
-        if (userStorage.read(userId) == null) {
+        if (userStorage.read(userId).isEmpty()) {
             throw new UserNotFoundException(String.format("User with id = %d not found", userId));
         }
-        Film film = filmStorage.read(filmId);
-        if (film == null) {
-            throw new FilmNotFoundException(String.format("Film with id = %d not found", filmId));
-        }
+        Film film = readFilm(filmId);
         if (!film.containsLike(userId)) {
             throw new FilmHasNoLikeFromUserException(String.format("Film with id = %d " +
                     "does not contain like from user with id = %d", filmId, userId));
@@ -79,12 +69,9 @@ public class FilmService {
     }
 
     public List<Film> getTopNFilmsByLikes(int n) {
-        if (n <= 0) {
-            throw new IncorrectParameterException("count");
-        }
         return filmStorage.getAll()
                 .stream()
-                .sorted(Comparator.comparing(f -> f.getLikes().size(), Comparator.reverseOrder()))
+                .sorted(Comparator.comparing(Film::getLikesCount, Comparator.reverseOrder()))
                 .limit(n)
                 .collect(Collectors.toList());
     }

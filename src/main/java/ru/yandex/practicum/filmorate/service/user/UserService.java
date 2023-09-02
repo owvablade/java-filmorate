@@ -21,21 +21,17 @@ public class UserService {
     private final UserStorage userStorage;
 
     public User createUser(User user) {
-        if (user.getName().isBlank() || user.getName() == null) {
-            user.setName(user.getLogin());
-        }
+        checkUserName(user);
         return userStorage.create(user);
     }
 
     public User readUser(Long userId) {
-        User user = userStorage.read(userId);
-        if (user == null) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
-        }
-        return user;
+        return userStorage.read(userId)
+                .orElseThrow(() -> new UserNotFoundException(String.format("User with id = %d not found", userId)));
     }
 
     public User updateUser(User user) {
+        checkUserName(user);
         if (userStorage.update(user) == null) {
             throw new UserNotFoundException(String.format("User with id = %d not found", user.getId()));
         }
@@ -50,9 +46,8 @@ public class UserService {
     }
 
     public void addFriend(Long userId, Long friendId) {
-        User user = userStorage.read(userId);
-        User friendUser = userStorage.read(friendId);
-        checkUsersExists(user, userId, friendUser, friendId);
+        User user = readUser(userId);
+        User friendUser = readUser(friendId);
         if (user.containsFriend(friendId) && friendUser.containsFriend(userId)) {
             throw new UsersAreAlreadyFriendsException(String.format(
                     "User with id = %d and id = %d are already friends",
@@ -65,9 +60,8 @@ public class UserService {
     }
 
     public void deleteFriend(Long userId, Long friendId) {
-        User user = userStorage.read(userId);
-        User friendUser = userStorage.read(friendId);
-        checkUsersExists(user, userId, friendUser, friendId);
+        User user = readUser(userId);
+        User friendUser = readUser(friendId);
         if (!user.containsFriend(friendId) && !friendUser.containsFriend(userId)) {
             throw new UsersAreNotFriendsException(String.format(
                     "User with id = %d and id = %d are not friends",
@@ -80,25 +74,21 @@ public class UserService {
     }
 
     public List<User> getUserFriends(Long userId) {
-        User user = userStorage.read(userId);
-        if (user == null) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
-        }
+        User user = readUser(userId);
         return new ArrayList<>(user.getFriends())
                 .stream()
-                .map(userStorage::read)
+                .map(this::readUser)
                 .collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(Long userId, Long anotherUserId) {
-        User user = userStorage.read(userId);
-        User anotherUser = userStorage.read(anotherUserId);
-        checkUsersExists(user, userId, anotherUser, anotherUserId);
+        User user = readUser(userId);
+        User anotherUser = readUser(anotherUserId);
         Set<Long> commonFriends = new HashSet<>(user.getFriends());
         commonFriends.retainAll(anotherUser.getFriends());
         return new ArrayList<>(commonFriends)
                 .stream()
-                .map(userStorage::read)
+                .map(this::readUser)
                 .collect(Collectors.toList());
     }
 
@@ -106,12 +96,9 @@ public class UserService {
         return userStorage.getAll();
     }
 
-    private void checkUsersExists(User user1, Long user1id, User user2, Long user2id) {
-        if (user1 == null) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", user1id));
-        }
-        if (user2 == null) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", user2id));
+    private void checkUserName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
         }
     }
 }

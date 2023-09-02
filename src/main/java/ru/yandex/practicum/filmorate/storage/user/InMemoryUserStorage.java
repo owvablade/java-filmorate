@@ -4,15 +4,12 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
-    private static long id = 1;
+    private long id = 1;
     private final Map<Long, User> userStorage;
 
     public InMemoryUserStorage() {
@@ -27,8 +24,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User read(Long id) {
-        return userStorage.get(id);
+    public Optional<User> read(Long id) {
+        return Optional.ofNullable(userStorage.get(id));
     }
 
     @Override

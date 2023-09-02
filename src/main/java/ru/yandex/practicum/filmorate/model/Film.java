@@ -51,4 +51,8 @@ public class Film {
     public boolean containsLike(Long userId) {
         return likes.contains(userId);
     }
+
+    public int getLikesCount() {
+        return likes.size();
+    }
 }
