@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exception.film.FilmAlreadyLikedByUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmHasNoLikeFromUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmNotFoundException;
@@ -18,6 +17,7 @@ import ru.yandex.practicum.filmorate.exception.user.UsersAreAlreadyFriendsExcept
 import ru.yandex.practicum.filmorate.exception.user.UsersAreNotFriendsException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,23 +34,22 @@ public class ErrorHandler {
                 .stream()
                 .map(FieldError::getField)
                 .collect(Collectors.toList());
-        return new ErrorResponse(String.format("Invalid fields: %s", fieldErrors), 400);
+        return new ErrorResponse(String.format("Invalid fields: %s", fieldErrors), HttpStatus.BAD_REQUEST.value());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
         log.error("Path variable error", e);
         return new ErrorResponse(String.format("Value '%s' is invalid for parameter '%s'", e.getValue(), e.getName()),
-                500);
+                HttpStatus.BAD_REQUEST.value());
     }
 
-    @ExceptionHandler(IncorrectParameterException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIncorrectParameterException(final ConstraintViolationException e) {
         log.error("Parameter error", e);
-        return new ErrorResponse(String.format("Value for parameter %s is invalid", e.getParameter()),
-                500);
+        return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value());
     }
 
     @ExceptionHandler({UserNotFoundException.class,
@@ -59,7 +58,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserException(final RuntimeException e) {
         log.error("User error", e);
-        return new ErrorResponse(e.getMessage(), 404);
+        return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
     }
 
     @ExceptionHandler({FilmNotFoundException.class,
@@ -68,6 +67,13 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleFilmException(final RuntimeException e) {
         log.error("Film error", e);
-        return new ErrorResponse(e.getMessage(), 404);
+        return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleThrowable(final Throwable e) {
+        log.error("Error", e);
+        return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 }
