@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.film.FilmAlreadyLikedByUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmHasNoLikeFromUserException;
@@ -15,11 +16,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+
+    @Autowired
+    public FilmService(@Qualifier("filmDaoImpl") FilmStorage filmStorage,
+                       @Qualifier("userDaoImpl") UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+    }
 
     public Film createFilm(Film film) {
         return filmStorage.create(film);
