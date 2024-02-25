@@ -178,7 +178,7 @@ public class FilmDaoImpl implements FilmStorage {
     private void addGenres(Film film) {
         List<Genre> genres = film.getGenres();
         if (!genres.isEmpty()) {
-            final String sql = "INSERT INTO films_genre (film_id, genre_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
+            final String sql = "INSERT INTO films_genre (film_id, genre_id) VALUES (?, ?);";
             jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@NonNull PreparedStatement ps, int i) throws SQLException {
