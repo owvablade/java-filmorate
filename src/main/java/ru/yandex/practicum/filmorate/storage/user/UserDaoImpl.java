@@ -63,7 +63,7 @@ public class UserDaoImpl implements UserStorage {
 
     @Override
     public User delete(User user) {
-        final String sql = "DELETE FROM users WHERE user_id = ? CASCADE;";
+        final String sql = "DELETE FROM users WHERE user_id = ?;";
         if (jdbcTemplate.update(sql, user.getId()) == 0) {
             return null;
         }

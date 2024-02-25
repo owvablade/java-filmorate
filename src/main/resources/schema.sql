@@ -57,16 +57,16 @@ CREATE TABLE IF NOT EXISTS users_friendship (
     PRIMARY KEY (source_user_id, target_user_id)
 );
 
-ALTER TABLE films ADD FOREIGN KEY (mpa_rating_id) REFERENCES mpa_rating (mpa_rating_id);
+ALTER TABLE films ADD FOREIGN KEY (mpa_rating_id) REFERENCES mpa_rating (mpa_rating_id) ON DELETE CASCADE;
 
-ALTER TABLE films_genre ADD FOREIGN KEY (film_id) REFERENCES films (film_id);
+ALTER TABLE films_genre ADD FOREIGN KEY (film_id) REFERENCES films (film_id) ON DELETE CASCADE;
 
-ALTER TABLE films_genre ADD FOREIGN KEY (genre_id) REFERENCES genre (genre_id);
+ALTER TABLE films_genre ADD FOREIGN KEY (genre_id) REFERENCES genre (genre_id) ON DELETE CASCADE;
 
-ALTER TABLE users_likes ADD FOREIGN KEY (user_id) REFERENCES users (user_id);
+ALTER TABLE users_likes ADD FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE;
 
-ALTER TABLE users_likes ADD FOREIGN KEY (film_id) REFERENCES films (film_id);
+ALTER TABLE users_likes ADD FOREIGN KEY (film_id) REFERENCES films (film_id) ON DELETE CASCADE;
 
-ALTER TABLE users_friendship ADD FOREIGN KEY (source_user_id) REFERENCES users (user_id);
+ALTER TABLE users_friendship ADD FOREIGN KEY (source_user_id) REFERENCES users (user_id) ON DELETE CASCADE;
 
-ALTER TABLE users_friendship ADD FOREIGN KEY (target_user_id) REFERENCES users (user_id);
+ALTER TABLE users_friendship ADD FOREIGN KEY (target_user_id) REFERENCES users (user_id) ON DELETE CASCADE;

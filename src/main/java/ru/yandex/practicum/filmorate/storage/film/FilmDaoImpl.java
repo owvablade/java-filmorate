@@ -112,7 +112,7 @@ public class FilmDaoImpl implements FilmStorage {
 
     @Override
     public Film delete(Film film) {
-        final String sql = "DELETE FROM films WHERE film_id = ? CASCADE;";
+        final String sql = "DELETE FROM films WHERE film_id = ?;";
         if (jdbcTemplate.update(sql, film.getId()) == 0) {
             return null;
         }
