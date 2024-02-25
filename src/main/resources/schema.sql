@@ -40,7 +40,6 @@ CREATE TABLE IF NOT EXISTS users_likes (
 CREATE TABLE IF NOT EXISTS users_friendship (
     source_user_id bigint,
     target_user_id bigint,
-    is_accepted bool NOT NULL,
     PRIMARY KEY (source_user_id, target_user_id)
 );
 
