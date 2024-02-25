@@ -32,7 +32,7 @@ class FilmValidationTest {
                 .setName("Pulp Fiction")
                 .setDescription("Pulp Fiction film description")
                 .setReleaseDate(LocalDate.of(1994, 5, 21))
-                .setDuration(Duration.ofMinutes(154));
+                .setDuration(154);
     }
 
     @Test
@@ -89,7 +89,7 @@ class FilmValidationTest {
 
     @Test
     void shouldNotValidateFilmWithNegativeDuration() {
-        film.setDuration(Duration.ofMinutes(-10));
+        film.setDuration(-10);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
@@ -98,7 +98,7 @@ class FilmValidationTest {
 
     @Test
     void shouldNotValidateFilmWithZeroDuration() {
-        film.setDuration(Duration.ZERO);
+        film.setDuration(0);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
