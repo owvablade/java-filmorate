@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component("filmDaoImpl")
 @RequiredArgsConstructor
@@ -63,7 +64,8 @@ public class FilmDaoImpl implements FilmStorage {
                 "LEFT JOIN mpa_rating AS mr ON f.mpa_rating_id = mr.mpa_rating_id\n" +
                 "LEFT JOIN films_genre AS fg ON f.film_id = fg.film_id\n" +
                 "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id\n" +
-                "WHERE f.film_id = ?;";
+                "WHERE f.film_id = ?\n" +
+                "ORDER BY g.genre_id;";
         return Optional.ofNullable(jdbcTemplate.query(sql, rs -> {
             Film result = null;
             while (rs.next()) {
@@ -99,6 +101,11 @@ public class FilmDaoImpl implements FilmStorage {
         if (rowsAffected != 1) {
             return null;
         }
+        List<Genre> genres = film.getGenres();
+        if (genres != null) {
+            genres = genres.stream().distinct().collect(Collectors.toList());
+        }
+        film.setGenres(genres);
         updateGenres(film);
         return film;
     }
@@ -126,7 +133,8 @@ public class FilmDaoImpl implements FilmStorage {
                 "FROM films AS f\n" +
                 "LEFT JOIN mpa_rating AS mr ON f.mpa_rating_id = mr.mpa_rating_id\n" +
                 "LEFT JOIN films_genre AS fg ON f.film_id = fg.film_id\n" +
-                "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id;";
+                "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id\n" +
+                "ORDER BY f.film_id;";
         return jdbcTemplate.query(sql, rs -> {
             List<Film> result = new ArrayList<>();
             Film currentFilm = null;
@@ -170,7 +178,7 @@ public class FilmDaoImpl implements FilmStorage {
     private void addGenres(Film film) {
         List<Genre> genres = film.getGenres();
         if (!genres.isEmpty()) {
-            final String sql = "INSERT INTO films_genre (film_id, genre_id) VALUES (?, ?)";
+            final String sql = "INSERT INTO films_genre (film_id, genre_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
             jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@NonNull PreparedStatement ps, int i) throws SQLException {

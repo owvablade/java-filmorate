@@ -33,7 +33,6 @@ public class Film {
     @Positive
     private Integer duration;
     private Mpa mpa;
-    @Setter(AccessLevel.NONE)
     private List<Genre> genres = new ArrayList<>();
     @Setter(AccessLevel.NONE)
     private Set<Long> likes = new HashSet<>();
