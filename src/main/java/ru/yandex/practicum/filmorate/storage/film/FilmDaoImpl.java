@@ -51,15 +51,7 @@ public class FilmDaoImpl implements FilmStorage {
 
     @Override
     public Optional<Film> read(Long id) {
-        final String sql = "SELECT f.film_id,\n" +
-                "f.film_name,\n" +
-                "f.film_description,\n" +
-                "f.film_release_date,\n" +
-                "f.film_duration,\n" +
-                "f.mpa_rating_id,\n" +
-                "mr.mpa_rating_name,\n" +
-                "g.genre_id,\n" +
-                "g.genre_name\n" +
+        final String sql = "SELECT *\n" +
                 "FROM films AS f\n" +
                 "LEFT JOIN mpa_rating AS mr ON f.mpa_rating_id = mr.mpa_rating_id\n" +
                 "LEFT JOIN films_genre AS fg ON f.film_id = fg.film_id\n" +
@@ -121,15 +113,7 @@ public class FilmDaoImpl implements FilmStorage {
 
     @Override
     public List<Film> getAll() {
-        final String sql = "SELECT f.film_id,\n" +
-                "f.film_name,\n" +
-                "f.film_description,\n" +
-                "f.film_release_date,\n" +
-                "f.film_duration,\n" +
-                "f.mpa_rating_id,\n" +
-                "mr.mpa_rating_name,\n" +
-                "g.genre_id,\n" +
-                "g.genre_name\n" +
+        final String sql = "SELECT *,\n" +
                 "FROM films AS f\n" +
                 "LEFT JOIN mpa_rating AS mr ON f.mpa_rating_id = mr.mpa_rating_id\n" +
                 "LEFT JOIN films_genre AS fg ON f.film_id = fg.film_id\n" +
