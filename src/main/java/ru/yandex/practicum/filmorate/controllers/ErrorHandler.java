@@ -12,6 +12,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import ru.yandex.practicum.filmorate.exception.film.FilmAlreadyLikedByUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmHasNoLikeFromUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.genre.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.like.LikeNotFoundException;
+import ru.yandex.practicum.filmorate.exception.mpa.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreAlreadyFriendsException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreNotFriendsException;
@@ -67,6 +70,15 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleFilmException(final RuntimeException e) {
         log.error("Film error", e);
+        return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
+    }
+
+    @ExceptionHandler({GenreNotFoundException.class,
+            LikeNotFoundException.class,
+            MpaNotFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleGenreLikeMpaException(final RuntimeException e) {
+        log.error("Object in database not found", e);
         return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
     }
 

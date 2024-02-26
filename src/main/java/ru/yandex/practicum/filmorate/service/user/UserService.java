@@ -1,24 +1,30 @@
 package ru.yandex.practicum.filmorate.service.user;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.user.UserCannotBefriendHimselfException;
 import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreAlreadyFriendsException;
-import ru.yandex.practicum.filmorate.exception.user.UsersAreNotFriendsException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friends.interfaces.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FriendStorage friendStorage;
+
+    @Autowired
+    public UserService(@Qualifier("userDaoImpl") UserStorage userStorage, FriendStorage friendStorage) {
+        this.userStorage = userStorage;
+        this.friendStorage = friendStorage;
+    }
 
     public User createUser(User user) {
         checkUserName(user);
@@ -46,50 +52,29 @@ public class UserService {
     }
 
     public void addFriend(Long userId, Long friendId) {
-        User user = readUser(userId);
-        User friendUser = readUser(friendId);
-        if (user.containsFriend(friendId) && friendUser.containsFriend(userId)) {
-            throw new UsersAreAlreadyFriendsException(String.format(
-                    "User with id = %d and id = %d are already friends",
-                    userId,
-                    friendId)
-            );
+        if (Objects.equals(userId, friendId)) {
+            throw new UserCannotBefriendHimselfException("User cannot befriend himself");
         }
-        user.addFriend(friendId);
-        friendUser.addFriend(userId);
+        try {
+            friendStorage.addFriend(userId, friendId);
+        } catch (DuplicateKeyException e) {
+            throw new UsersAreAlreadyFriendsException(
+                    String.format("User with id %d already has friend with id %d.", userId, friendId), e);
+        } catch (DataIntegrityViolationException e) {
+            throw new UserNotFoundException(String.format("User with id %d or %d not found.", userId, friendId), e);
+        }
     }
 
     public void deleteFriend(Long userId, Long friendId) {
-        User user = readUser(userId);
-        User friendUser = readUser(friendId);
-        if (!user.containsFriend(friendId) && !friendUser.containsFriend(userId)) {
-            throw new UsersAreNotFriendsException(String.format(
-                    "User with id = %d and id = %d are not friends",
-                    userId,
-                    friendId)
-            );
-        }
-        user.removeFriend(friendId);
-        friendUser.removeFriend(userId);
+        friendStorage.removeFriend(userId, friendId);
     }
 
     public List<User> getUserFriends(Long userId) {
-        User user = readUser(userId);
-        return new ArrayList<>(user.getFriends())
-                .stream()
-                .map(this::readUser)
-                .collect(Collectors.toList());
+        return new ArrayList<>(friendStorage.getFriends(userId));
     }
 
-    public List<User> getCommonFriends(Long userId, Long anotherUserId) {
-        User user = readUser(userId);
-        User anotherUser = readUser(anotherUserId);
-        Set<Long> commonFriends = new HashSet<>(user.getFriends());
-        commonFriends.retainAll(anotherUser.getFriends());
-        return new ArrayList<>(commonFriends)
-                .stream()
-                .map(this::readUser)
-                .collect(Collectors.toList());
+    public List<User> getCommonFriends(Long userId, Long otherId) {
+        return new ArrayList<>(friendStorage.getCommonFriends(userId, otherId));
     }
 
     public List<User> getAllUsers() {

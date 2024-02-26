@@ -1,25 +1,31 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.film.FilmAlreadyLikedByUserException;
-import ru.yandex.practicum.filmorate.exception.film.FilmHasNoLikeFromUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.like.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
+import ru.yandex.practicum.filmorate.storage.likes.interfaces.LikesStorage;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final LikesStorage likesStorage;
+
+    @Autowired
+    public FilmService(@Qualifier("filmDaoImpl") FilmStorage filmStorage,
+                       LikesStorage likesStorage) {
+        this.filmStorage = filmStorage;
+        this.likesStorage = likesStorage;
+    }
 
     public Film createFilm(Film film) {
         return filmStorage.create(film);
@@ -45,35 +51,26 @@ public class FilmService {
     }
 
     public void addLike(Long filmId, Long userId) {
-        if (userStorage.read(userId).isEmpty()) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
+        try {
+            likesStorage.addLike(filmId, userId);
+        } catch (DuplicateKeyException e) {
+            throw new FilmAlreadyLikedByUserException(
+                    String.format("User with id %d has already liked film with id %d.", userId, filmId), e);
+        } catch (DataIntegrityViolationException e) {
+            throw new FilmNotFoundException(
+                    String.format("User with id %d or film with id %d not found.", userId, filmId), e);
         }
-        Film film = readFilm(filmId);
-        if (film.containsLike(userId)) {
-            throw new FilmAlreadyLikedByUserException(String.format("Film with id = %d " +
-                    "already has like from user with id = %d", filmId, userId));
-        }
-        film.addLike(userId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
-        if (userStorage.read(userId).isEmpty()) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
+        if (likesStorage.deleteLike(filmId, userId) == 0) {
+            throw new LikeNotFoundException(String.format(
+                    "Like from user with id=%d was not found on film with id=%d. Or vice versa", userId, filmId));
         }
-        Film film = readFilm(filmId);
-        if (!film.containsLike(userId)) {
-            throw new FilmHasNoLikeFromUserException(String.format("Film with id = %d " +
-                    "does not contain like from user with id = %d", filmId, userId));
-        }
-        film.deleteLike(userId);
     }
 
     public List<Film> getTopNFilmsByLikes(int n) {
-        return filmStorage.getAll()
-                .stream()
-                .sorted(Comparator.comparing(Film::getLikesCount, Comparator.reverseOrder()))
-                .limit(n)
-                .collect(Collectors.toList());
+        return likesStorage.getNPopular(n);
     }
 
     public List<Film> getAllFilms() {

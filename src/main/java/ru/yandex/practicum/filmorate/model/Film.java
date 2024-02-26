@@ -1,23 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
-import ru.yandex.practicum.filmorate.json.deserializers.DurationDeserializer;
-import ru.yandex.practicum.filmorate.json.serializers.DurationSerializer;
 import ru.yandex.practicum.filmorate.validation.annotations.MinimumDate;
-import ru.yandex.practicum.filmorate.validation.annotations.PositiveDuration;
 
 import javax.validation.constraints.NotBlank;
-import java.time.Duration;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -33,10 +30,10 @@ public class Film {
     @MinimumDate
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
-    @PositiveDuration
-    @JsonSerialize(using = DurationSerializer.class)
-    @JsonDeserialize(using = DurationDeserializer.class)
-    private Duration duration;
+    @Positive
+    private Integer duration;
+    private Mpa mpa;
+    private List<Genre> genres = new ArrayList<>();
     @Setter(AccessLevel.NONE)
     private Set<Long> likes = new HashSet<>();
 
@@ -50,6 +47,18 @@ public class Film {
 
     public boolean containsLike(Long userId) {
         return likes.contains(userId);
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
+
+    public void deleteGenre(Genre genre) {
+        genres.remove(genre);
+    }
+
+    public boolean containsGenre(Genre genre) {
+        return genres.contains(genre);
     }
 
     public int getLikesCount() {
