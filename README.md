@@ -20,94 +20,59 @@
 между таблицами films и users.
 ### Примеры запросов
 - **Получение всех фильмов:**
-  1. Основной запрос:  
-  ```
-  SELECT *
-  FROM films;
-  ```
-  2. Запрос для получения жанров для конректного фильма:
-  ```
-  SELECT genre_id
-  FROM films_genre
-  WHERE film_id = ?;
-  ```
-  или
-  ```
-  SELECT genre_name
-  FROM films_genre
-  JOIN genre ON films_genre.genre_id = genre.genre_id
-  WHERE film_id = ?;
-  ```
-  3. Запрос для получения рейтинга:
-  ```
-  SELECT mpa_rating_id
-  FROM films
-  WHERE film_id = ?;
-  ```
-  или
-  ```
-  SELECT mpa_rating_name
-  FROM mpa_rating
-  WHERE mpa_rating_id =
-  (SELECT mpa_rating_id
-  FROM films
-  WHERE film_id = ?);
-  ```
+```
+SELECT f.film_id,
+       f.film_name,
+       f.film_description,
+       f.film_release_date,
+       f.film_duration,
+       f.mpa_rating_id,
+       mr.mpa_rating_name,
+       g.genre_id,
+       g.genre_name
+FROM films AS f
+LEFT JOIN mpa_rating AS mr ON f.mpa_rating_id = mr.mpa_rating_id
+LEFT JOIN films_genre AS fg ON f.film_id = fg.film_id
+LEFT JOIN genre AS g ON fg.genre_id = g.genre_id
+ORDER BY f.film_id;
+```
+
 - **Получение всех пользователей:**
-  1. Основной запрос:
-  ```
-  SELECT *
-  FROM users;
-  ```
-  2. Запрос для получения друзей:
-  ```
-  SELECT target_user_id AS friend_id
-  FROM users_friendship
-  WHERE source_user_id = ? AND is_accepted = TRUE
-  UNION ALL
-  SELECT source_user_id AS friend_id
-  FROM users_friendship
-  WHERE target_user_id = ? AND is_accepted = TRUE;
-  ```
-  3. Запрос для получения лайкнутых фильмов:
-  ```
-  SELECT film_id
-  FROM users_likes
-  WHERE user_id = ?;
-  ```
+```
+SELECT *
+FROM users;
+```
 - **Получение топ N наиболее популярных фильмов:**
 ```
-SELECT film_id,
-       COUNT(film_id)
-FROM users_likes
-GROUP BY film_id
-ORDER BY COUNT(film_id) DESC
-LIMIT N;
+SELECT f.film_id,
+       f.film_name,
+       f.film_description,
+       f.film_release_date,
+       f.film_duration,
+       f.mpa_rating_id,
+       mr.mpa_rating_name,
+       g.genre_id,
+       g.genre_name,
+       COUNT(ul.film_id)
+FROM users_likes ul
+RIGHT JOIN films AS f ON f.film_id = ul.film_id
+LEFT JOIN mpa_rating AS mr ON f.mpa_rating_id = mr.mpa_rating_id
+LEFT JOIN films_genre AS fg ON f.film_id = fg.film_id
+LEFT JOIN genre AS g ON fg.genre_id = g.genre_id
+GROUP BY ul.film_id, f.film_id, g.genre_id, mr.mpa_rating_name
+ORDER BY COUNT(ul.film_id) DESC
+LIMIT ?;
 ```
 - **Получение списка общих друзей с другим пользователем:**
 ```
-SELECT userA.friend_id
-FROM
-  (SELECT target_user_id AS friend_id
-   FROM users_friendship
-   WHERE source_user_id = ?
-     AND is_accepted = TRUE
-   UNION ALL 
-   SELECT source_user_id AS friend_id
-   FROM users_friendship
-   WHERE target_user_id = ?
-     AND is_accepted = TRUE) AS userA
-JOIN
-SELECT userB.friend_id
-FROM
-  (SELECT target_user_id AS friend_id
-   FROM users_friendship
-   WHERE source_user_id = ??
-     AND is_accepted = TRUE
-   UNION ALL 
-   SELECT source_user_id AS friend_id
-   FROM users_friendship
-   WHERE target_user_id = ??
-     AND is_accepted = TRUE) AS userB ON userA.friend_id = userB.friend_id;
-```  
-где ? - id первого пользователя, а ?? - id второго пользователя
+SELECT u.user_id,
+       u.user_email,
+       u.user_login,
+       u.user_name,
+       u.user_birthday
+FROM users_friendship uf
+JOIN users u ON uf.target_user_id = u.user_id
+WHERE source_user_id = ?
+  AND uf.target_user_id != ?
+ORDER BY user_id;
+```
