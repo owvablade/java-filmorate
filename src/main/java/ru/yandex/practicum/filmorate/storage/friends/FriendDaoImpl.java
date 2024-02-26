@@ -37,32 +37,19 @@ public class FriendDaoImpl implements FriendStorage {
                 "u.user_birthday\n" +
                 "FROM users_friendship uf\n" +
                 "JOIN users u ON uf.target_user_id = u.user_id\n" +
-                "WHERE source_user_id = ?;";
+                "WHERE source_user_id = ?\n" +
+                "ORDER BY u.user_id;";
         return jdbcTemplate.query(sql, this::makeUser, id);
     }
 
     @Override
     public List<User> getCommonFriends(Long id, Long otherId) {
-        final String sql = "SELECT u.user_id,\n" +
-                "u.user_email,\n" +
-                "u.user_login,\n" +
-                "u.user_name,\n" +
-                "u.user_birthday\n" +
+        final String sql = "SELECT u.user_id, u.user_email, u.user_login, u.user_name, u.user_birthday \n" +
                 "FROM users_friendship uf\n" +
                 "JOIN users u ON uf.target_user_id = u.user_id\n" +
-                "WHERE uf.source_user_id = ?\n" +
-                "AND uf.target_user_id != ?\n" +
-                "UNION\n" +
-                "SELECT u.user_id,\n" +
-                "u.user_email,\n" +
-                "u.user_login,\n" +
-                "u.user_name,\n" +
-                "u.user_birthday\n" +
-                "FROM users_friendship uf\n" +
-                "JOIN users u ON uf.target_user_id = u.user_id\n" +
-                "WHERE uf.source_user_id = ?\n" +
-                "AND uf.source_user_id != ?;";
-        return jdbcTemplate.query(sql, this::makeUser, id, otherId, otherId, id);
+                "WHERE source_user_id = ? AND uf.target_user_id != ?\n" +
+                "ORDER BY user_id;";
+        return jdbcTemplate.query(sql, this::makeUser, id, otherId);
     }
 
     private User makeUser(ResultSet rs, int rowNum) throws SQLException {
