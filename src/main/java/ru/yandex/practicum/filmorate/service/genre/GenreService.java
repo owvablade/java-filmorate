@@ -15,8 +15,8 @@ public class GenreService {
     private final GenreStorage genreStorage;
 
     public Genre getGenre(Integer id) {
-        return genreStorage.get(id).orElseThrow(() -> new GenreNotFoundException(
-                String.format("Genre with id = %d not found", id)));
+        return genreStorage.get(id).orElseThrow(() ->
+                new GenreNotFoundException(String.format("Genre with id = %d not found", id)));
     }
 
     public List<Genre> getAllGenre() {

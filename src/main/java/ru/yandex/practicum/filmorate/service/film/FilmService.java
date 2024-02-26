@@ -54,11 +54,11 @@ public class FilmService {
         try {
             likesStorage.addLike(filmId, userId);
         } catch (DuplicateKeyException e) {
-            throw new FilmAlreadyLikedByUserException(String.format("User with id %d has already liked " +
-                    "film with id %d. More info: %s", userId, filmId, e.getMessage()));
+            throw new FilmAlreadyLikedByUserException(
+                    String.format("User with id %d has already liked film with id %d.", userId, filmId), e);
         } catch (DataIntegrityViolationException e) {
-            throw new FilmNotFoundException(String.format("User with id %d or film with id %d not found. More info: %s",
-                    userId, filmId, e.getMessage()));
+            throw new FilmNotFoundException(
+                    String.format("User with id %d or film with id %d not found.", userId, filmId), e);
         }
     }
 

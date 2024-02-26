@@ -58,12 +58,10 @@ public class UserService {
         try {
             friendStorage.addFriend(userId, friendId);
         } catch (DuplicateKeyException e) {
-            throw new UsersAreAlreadyFriendsException(String.format("User with id %d already has friend with id %d. " +
-                            "More info: %s",
-                    userId, friendId, e.getMessage()));
+            throw new UsersAreAlreadyFriendsException(
+                    String.format("User with id %d already has friend with id %d.", userId, friendId), e);
         } catch (DataIntegrityViolationException e) {
-            throw new UserNotFoundException(String.format("User with id %d or %d not found. More info: %s",
-                    userId, friendId, e.getMessage()));
+            throw new UserNotFoundException(String.format("User with id %d or %d not found.", userId, friendId), e);
         }
     }
 

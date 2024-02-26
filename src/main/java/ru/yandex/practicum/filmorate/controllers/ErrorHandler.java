@@ -73,24 +73,12 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
     }
 
-    @ExceptionHandler({MpaNotFoundException.class})
+    @ExceptionHandler({GenreNotFoundException.class,
+            LikeNotFoundException.class,
+            MpaNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleMpaException(final RuntimeException e) {
-        log.error("Mpa error", e);
-        return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
-    }
-
-    @ExceptionHandler({GenreNotFoundException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleGenreException(final RuntimeException e) {
-        log.error("Genre error", e);
-        return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
-    }
-
-    @ExceptionHandler({LikeNotFoundException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleLikeException(final RuntimeException e) {
-        log.error("Like error", e);
+    public ErrorResponse handleGenreLikeMpaException(final RuntimeException e) {
+        log.error("Object in database not found", e);
         return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
     }
 
