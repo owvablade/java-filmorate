@@ -60,45 +60,41 @@ class FriendDaoImplTest {
     @Test
     void addNonexistentFriend() {
         assertThrows(DataIntegrityViolationException.class, () -> friendDao.addFriend(Long.MIN_VALUE, Long.MAX_VALUE));
-        final int expectedFriendSize = 0;
 
         User createdFirstUser = userDao.create(firstUser);
         assertAll(
                 () -> assertThrows(DataIntegrityViolationException.class,
                         () -> friendDao.addFriend(createdFirstUser.getId(), Long.MAX_VALUE)),
-                () -> assertEquals(expectedFriendSize, friendDao.getFriends(createdFirstUser.getId()).size())
+                () -> assertNull(friendDao.getFriends(createdFirstUser.getId()))
         );
     }
 
     @Test
     void removeFriend() {
-        final int expectedFriendSize = 0;
-
         User createdFirstUser = userDao.create(firstUser);
         User createdSecondUser = userDao.create(secondUser);
         friendDao.addFriend(createdFirstUser.getId(), createdSecondUser.getId());
         friendDao.removeFriend(createdFirstUser.getId(), createdSecondUser.getId());
 
-        assertEquals(expectedFriendSize, friendDao.getFriends(createdFirstUser.getId()).size());
+        assertNull(friendDao.getFriends(createdFirstUser.getId()));
     }
 
     @Test
     void removeNonexistentFriend() {
         assertDoesNotThrow(() -> friendDao.removeFriend(Long.MIN_VALUE, Long.MAX_VALUE));
-        final int expectedFriendSize = 0;
 
         User createdFirstUser = userDao.create(firstUser);
         assertAll(
                 () -> assertDoesNotThrow(() -> friendDao.removeFriend(createdFirstUser.getId(), Long.MAX_VALUE)),
-                () -> assertEquals(expectedFriendSize, friendDao.getFriends(createdFirstUser.getId()).size())
+                () -> assertNull(friendDao.getFriends(createdFirstUser.getId()))
         );
     }
 
     @Test
     void getFriends() {
         assertAll(
-                () -> assertEquals(0, friendDao.getFriends(Long.MIN_VALUE).size()),
-                () -> assertEquals(0, friendDao.getFriends(Long.MAX_VALUE).size())
+                () -> assertNull(friendDao.getFriends(Long.MIN_VALUE)),
+                () -> assertNull(friendDao.getFriends(Long.MAX_VALUE))
         );
 
         final int expectedFriendSize = 2;
