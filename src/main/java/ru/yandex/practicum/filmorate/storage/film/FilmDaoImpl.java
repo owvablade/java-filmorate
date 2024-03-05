@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component("filmDaoImpl")
+@Component
 @RequiredArgsConstructor
 public class FilmDaoImpl implements FilmStorage {
 
@@ -103,12 +103,9 @@ public class FilmDaoImpl implements FilmStorage {
     }
 
     @Override
-    public Film delete(Film film) {
+    public boolean delete(Long id) {
         final String sql = "DELETE FROM films WHERE film_id = ?;";
-        if (jdbcTemplate.update(sql, film.getId()) == 0) {
-            return null;
-        }
-        return film;
+        return jdbcTemplate.update(sql, id) != 0;
     }
 
     @Override

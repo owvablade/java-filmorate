@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -15,17 +14,11 @@ import ru.yandex.practicum.filmorate.storage.likes.interfaces.LikesStorage;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
     private final LikesStorage likesStorage;
-
-    @Autowired
-    public FilmService(@Qualifier("filmDaoImpl") FilmStorage filmStorage,
-                       LikesStorage likesStorage) {
-        this.filmStorage = filmStorage;
-        this.likesStorage = likesStorage;
-    }
 
     public Film createFilm(Film film) {
         return filmStorage.create(film);
@@ -43,11 +36,10 @@ public class FilmService {
         return film;
     }
 
-    public Film deleteFilm(Film film) {
-        if (filmStorage.delete(film) == null) {
-            throw new FilmNotFoundException(String.format("Film with id = %d not found", film.getId()));
+    public void deleteFilm(Long id) {
+        if (!filmStorage.delete(id)) {
+            throw new FilmNotFoundException(String.format("Film with id = %d not found", id));
         }
-        return film;
     }
 
     public void addLike(Long filmId, Long userId) {
