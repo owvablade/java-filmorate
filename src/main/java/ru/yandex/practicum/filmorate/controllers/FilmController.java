@@ -38,6 +38,12 @@ public class FilmController {
         return filmService.updateFilm(film);
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        log.info("Invoke delete film method at resource DELETE /films={}", id);
+        filmService.deleteFilm(id);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Invoke add like to film method at resource PUT /films/{}/like/{}", id, userId);

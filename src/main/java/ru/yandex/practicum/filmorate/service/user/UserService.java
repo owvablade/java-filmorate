@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -15,16 +14,11 @@ import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
-
-    @Autowired
-    public UserService(@Qualifier("userDaoImpl") UserStorage userStorage, FriendStorage friendStorage) {
-        this.userStorage = userStorage;
-        this.friendStorage = friendStorage;
-    }
 
     public User createUser(User user) {
         checkUserName(user);
@@ -44,11 +38,10 @@ public class UserService {
         return user;
     }
 
-    public User deleteUser(User user) {
-        if (userStorage.delete(user) == null) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", user.getId()));
+    public void deleteUser(Long userId) {
+        if (!userStorage.delete(userId)) {
+            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
         }
-        return user;
     }
 
     public void addFriend(Long userId, Long friendId) {
@@ -70,6 +63,7 @@ public class UserService {
     }
 
     public List<User> getUserFriends(Long userId) {
+        readUser(userId);
         return new ArrayList<>(friendStorage.getFriends(userId));
     }
 

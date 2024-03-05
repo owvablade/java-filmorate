@@ -50,14 +50,16 @@ public class LikesDaoImpl implements LikesStorage {
                 "LEFT JOIN films_genre AS fg ON f.film_id = fg.film_id\n" +
                 "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id\n" +
                 "GROUP BY ul.film_id, f.film_id, g.genre_id, mr.mpa_rating_name\n" +
-                "ORDER BY COUNT(ul.film_id) DESC\n" +
-                "LIMIT ?;";
+                "ORDER BY COUNT(ul.film_id) DESC;";
         return jdbcTemplate.query(sql, rs -> {
             List<Film> result = new ArrayList<>();
             Film currentFilm = null;
             while (rs.next()) {
                 long currentId = rs.getLong("film_id");
                 if (currentFilm == null || currentId != currentFilm.getId()) {
+                    if (result.size() == n) {
+                        break;
+                    }
                     Film film = makeFilm(rs);
                     film.setMpa(makeMpa(rs));
                     makeGenre(rs).ifPresent(film::addGenre);
@@ -68,7 +70,7 @@ public class LikesDaoImpl implements LikesStorage {
                 }
             }
             return result;
-        }, n);
+        });
     }
 
     private Film makeFilm(ResultSet rs) throws SQLException {
