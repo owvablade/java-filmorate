@@ -107,21 +107,22 @@ class UserDaoImplTest {
     void deleteValidUser() {
         User userToBeDeleted = userDao.create(firstUser);
 
-        User deletedUser = userDao.delete(userToBeDeleted);
+        boolean deletedUser = userDao.delete(userToBeDeleted.getId());
 
-        assertNotNull(deletedUser);
-        assertNull(userDao.read(userToBeDeleted.getId()).orElse(null));
+        assertAll(
+                () -> assertTrue(deletedUser),
+                () -> assertNull(userDao.read(userToBeDeleted.getId()).orElse(null))
+        );
     }
 
     @Test
     void deleteInvalidUser() {
         userDao.create(firstUser);
 
-        firstUser.setId(Long.MIN_VALUE);
-        assertNull(userDao.delete(firstUser));
-
-        firstUser.setId(Long.MAX_VALUE);
-        assertNull(userDao.delete(firstUser));
+        assertAll(
+                () -> assertFalse(userDao.delete(Long.MIN_VALUE)),
+                () -> assertFalse(userDao.delete(Long.MAX_VALUE))
+        );
     }
 
     @Test
