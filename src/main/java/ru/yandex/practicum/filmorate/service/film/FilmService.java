@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -13,19 +12,14 @@ import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.likes.interfaces.LikesStorage;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
     private final LikesStorage likesStorage;
-
-    @Autowired
-    public FilmService(@Qualifier("filmDaoImpl") FilmStorage filmStorage,
-                       LikesStorage likesStorage) {
-        this.filmStorage = filmStorage;
-        this.likesStorage = likesStorage;
-    }
 
     public Film createFilm(Film film) {
         return filmStorage.create(film);
@@ -43,11 +37,10 @@ public class FilmService {
         return film;
     }
 
-    public Film deleteFilm(Film film) {
-        if (filmStorage.delete(film) == null) {
-            throw new FilmNotFoundException(String.format("Film with id = %d not found", film.getId()));
+    public void deleteFilm(Long id) {
+        if (!filmStorage.delete(id)) {
+            throw new FilmNotFoundException(String.format("Film with id = %d not found", id));
         }
-        return film;
     }
 
     public void addLike(Long filmId, Long userId) {
@@ -69,6 +62,10 @@ public class FilmService {
         }
     }
 
+    public List<Film> getAllFilms() {
+        return filmStorage.getAll();
+    }
+
     public List<Film> getTopNFilmsByLikes(int n) {
         return filmStorage.getTopNPopular(n);
     }
@@ -77,7 +74,40 @@ public class FilmService {
         return filmStorage.getAllByDirector(directorId, sort);
     }
 
-    public List<Film> getAllFilms() {
-        return filmStorage.getAll();
+    public List<Film> getMostPopularByGenreAndYear(String year, String genreId, int limit) {
+        var temp = filmStorage.getAll();
+
+        if (year == null & genreId != null) {
+            final int genId = Integer.parseInt(genreId);
+            return temp.stream()
+                    .filter(film ->
+                            film.getGenres()
+                                    .stream()
+                                    .anyMatch(genre -> genre.getId() == genId))
+                    .limit(limit)
+                    .collect(Collectors.toList());
+        } else if (year != null & genreId == null) {
+            final int yearInt = Integer.parseInt(year);
+            return temp.stream()
+                    .filter(film -> film.getReleaseDate().getYear() == yearInt)
+                    .limit(limit)
+                    .collect(Collectors.toList());
+        }
+
+        final int genId = Integer.parseInt(genreId);
+        final int yearInt = Integer.parseInt(year);
+
+        return temp.stream()
+                .filter(film -> film.getReleaseDate().getYear() == yearInt)
+                .filter(film ->
+                        film.getGenres()
+                                .stream()
+                                .anyMatch(genre -> genre.getId() == genId))
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 }

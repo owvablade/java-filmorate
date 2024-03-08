@@ -13,9 +13,11 @@ public interface FilmStorage {
 
     Film update(Film film);
 
-    Film delete(Film film);
+    boolean delete(Long id);
 
     List<Film> getAll();
+
+    List<Film> getCommonFilms(Long userId, Long friendId);
 
     List<Film> getTopNPopular(int n);
 

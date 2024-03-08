@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@Component("userDaoImpl")
+@Component
 @RequiredArgsConstructor
 public class UserDaoImpl implements UserStorage {
 
@@ -62,12 +62,9 @@ public class UserDaoImpl implements UserStorage {
     }
 
     @Override
-    public User delete(User user) {
+    public boolean delete(Long id) {
         final String sql = "DELETE FROM users WHERE user_id = ?;";
-        if (jdbcTemplate.update(sql, user.getId()) == 0) {
-            return null;
-        }
-        return user;
+        return jdbcTemplate.update(sql, id) != 0;
     }
 
     @Override

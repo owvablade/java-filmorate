@@ -40,6 +40,12 @@ public class FilmController {
         return filmService.updateFilm(film);
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        log.info("Invoke delete film method at resource DELETE /films={}", id);
+        filmService.deleteFilm(id);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Invoke add like to film method at resource PUT /films/{}/like/{}", id, userId);
@@ -53,17 +59,29 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getTopNPopular(
-            @RequestParam(defaultValue = "10")
-            @Positive(message = "Parameter count must be positive")
-            Integer count) {
+    public List<Film> getMostPopular(
+            @RequestParam(value = "count", defaultValue = "10") @Positive(message = "Parameter count must be positive") Integer count,
+            @RequestParam(value = "genreId", required = false) String genreId,
+            @RequestParam(value = "year", required = false) String year) {
+
         log.info("Invoke get most n popular film method at resource GET /films/popular?count={}", count);
-        return filmService.getTopNFilmsByLikes(count);
+
+        if (genreId == null && year == null) {
+            return filmService.getTopNFilmsByLikes(count);
+        }
+
+        return filmService.getMostPopularByGenreAndYear(year, genreId, count);
     }
 
     @GetMapping
     public List<Film> getAll() {
         return filmService.getAllFilms();
+    }
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam("userId") Long userId,
+                                     @RequestParam("friendId") Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
     }
 
     @GetMapping("/director/{directorId}")

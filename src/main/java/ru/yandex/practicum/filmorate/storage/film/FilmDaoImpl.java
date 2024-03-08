@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component("filmDaoImpl")
+@Component
 @RequiredArgsConstructor
 public class FilmDaoImpl implements FilmStorage {
 
@@ -114,12 +114,9 @@ public class FilmDaoImpl implements FilmStorage {
     }
 
     @Override
-    public Film delete(Film film) {
+    public boolean delete(Long id) {
         final String sql = "DELETE FROM films WHERE film_id = ?;";
-        if (jdbcTemplate.update(sql, film.getId()) == 0) {
-            return null;
-        }
-        return film;
+        return jdbcTemplate.update(sql, id) != 0;
     }
 
     @Override
@@ -221,6 +218,37 @@ public class FilmDaoImpl implements FilmStorage {
                     "ORDER BY f.film_release_date;";
         }
         return jdbcTemplate.query(sql, this::makeFilm, directorId);
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        final String sql = "SELECT f.film_id,\n" +
+                "f.film_name,\n" +
+                "f.film_description,\n" +
+                "f.film_release_date,\n" +
+                "f.film_duration,\n" +
+                "f.mpa_rating_id,\n" +
+                "mr.mpa_rating_name,\n" +
+                "LISTAGG(DISTINCT g.genre_id, ',') WITHIN GROUP (ORDER BY g.genre_id) AS genre_id,\n" +
+                "LISTAGG(DISTINCT g.genre_name, ',') WITHIN GROUP (ORDER BY g.genre_id) AS genre_name,\n" +
+                "LISTAGG(DISTINCT d.director_id, ',') WITHIN GROUP (ORDER BY d.director_id) AS director_id,\n" +
+                "LISTAGG(DISTINCT d.director_name, ',') WITHIN GROUP (ORDER BY d.director_id) AS director_name,\n" +
+                "COUNT(DISTINCT ul.user_id) AS cnt\n" +
+                "FROM users_likes AS ul\n" +
+                "LEFT JOIN films AS f ON f.film_id = ul.film_id\n" +
+                "LEFT JOIN mpa_rating AS mr ON f.mpa_rating_id = mr.mpa_rating_id\n" +
+                "LEFT JOIN films_genre AS fg ON f.film_id = fg.film_id\n" +
+                "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id\n" +
+                "LEFT JOIN films_director AS fd ON fd.film_id = f.film_id\n" +
+                "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
+                "WHERE ul.film_id IN (\n" +
+                "SELECT film_id FROM users_likes ul WHERE user_id = ?\n" +
+                "INTERSECT\n" +
+                "SELECT film_id FROM users_likes ul WHERE user_id = ?\n" +
+                ")\n" +
+                "GROUP BY f.film_id\n" +
+                "ORDER BY cnt DESC;";
+        return jdbcTemplate.query(sql, this::makeFilm, userId, friendId);
     }
 
     private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {

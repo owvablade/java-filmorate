@@ -226,23 +226,24 @@ class FilmDaoImplTest {
         Film filmToBeDeletedWithoutGenre = filmDao.create(firstFilm);
         Film filmToBeDeletedWithGenre = filmDao.create(secondFilm);
 
-        Film deletedFilmWithoutGenre = filmDao.delete(filmToBeDeletedWithoutGenre);
-        Film deletedFilmWithGenre = filmDao.delete(filmToBeDeletedWithGenre);
+        boolean deletedFilmWithoutGenre = filmDao.delete(filmToBeDeletedWithoutGenre.getId());
+        boolean deletedFilmWithGenre = filmDao.delete(filmToBeDeletedWithGenre.getId());
 
-        assertNotNull(deletedFilmWithoutGenre);
-        assertNotNull(deletedFilmWithGenre);
-        assertNull(filmDao.read(filmToBeDeletedWithoutGenre.getId()).orElse(null));
-        assertNull(filmDao.read(filmToBeDeletedWithGenre.getId()).orElse(null));
+        assertAll(
+                () -> assertTrue(deletedFilmWithoutGenre),
+                () -> assertTrue(deletedFilmWithGenre),
+                () -> assertNull(filmDao.read(filmToBeDeletedWithoutGenre.getId()).orElse(null)),
+                () -> assertNull(filmDao.read(filmToBeDeletedWithGenre.getId()).orElse(null))
+        );
     }
 
     @Test
     void deleteInvalidFilm() {
         filmDao.create(firstFilm);
-        firstFilm.setId(Long.MIN_VALUE);
-        assertNull(filmDao.delete(firstFilm));
-
-        firstFilm.setId(Long.MAX_VALUE);
-        assertNull(filmDao.delete(firstFilm));
+        assertAll(
+                () -> assertFalse(filmDao.delete(Long.MIN_VALUE)),
+                () -> assertFalse(filmDao.delete(Long.MAX_VALUE))
+        );
     }
 
     @Test
