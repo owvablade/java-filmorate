@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.likes.interfaces.LikesStorage;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +62,10 @@ public class FilmService {
         }
     }
 
+    public List<Film> getAllFilms() {
+        return filmStorage.getAll();
+    }
+
     public List<Film> getTopNFilmsByLikes(int n) {
         return filmStorage.getTopNPopular(n);
     }
@@ -69,7 +74,36 @@ public class FilmService {
         return filmStorage.getAllByDirector(directorId, sort);
     }
 
-    public List<Film> getAllFilms() {
-        return filmStorage.getAll();
+    public List<Film> getMostPopularByGenreAndYear(String year, String genreId, int limit) {
+        var temp = filmStorage.getAll();
+
+        if (year == null & genreId != null) {
+            final int genId = Integer.parseInt(genreId);
+            return temp.stream()
+                    .filter(film ->
+                            film.getGenres()
+                                    .stream()
+                                    .anyMatch(genre -> genre.getId() == genId))
+                    .limit(limit)
+                    .collect(Collectors.toList());
+        } else if (year != null & genreId == null) {
+            final int yearInt = Integer.parseInt(year);
+            return temp.stream()
+                    .filter(film -> film.getReleaseDate().getYear() == yearInt)
+                    .limit(limit)
+                    .collect(Collectors.toList());
+        }
+
+        final int genId = Integer.parseInt(genreId);
+        final int yearInt = Integer.parseInt(year);
+
+        return temp.stream()
+                .filter(film -> film.getReleaseDate().getYear() == yearInt)
+                .filter(film ->
+                        film.getGenres()
+                                .stream()
+                                .anyMatch(genre -> genre.getId() == genId))
+                .limit(limit)
+                .collect(Collectors.toList());
     }
 }
