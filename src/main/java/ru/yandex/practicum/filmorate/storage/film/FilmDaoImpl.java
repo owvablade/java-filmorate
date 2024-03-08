@@ -320,4 +320,28 @@ public class FilmDaoImpl implements FilmStorage {
             });
         }
     }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        final String sql =
+
+                "SELECT f.film_id, f.film_name, f.film_description, f.film_release_date, f.film_duration, mpa.mpa_rating_id, mpa.mpa_rating_name " +
+                        "FROM users_likes ul " +
+                        "JOIN films f on ul.film_id = f.film_id " +
+                        "JOIN mpa_rating mpa on f.mpa_rating_id = mpa.mpa_rating_id " +
+                        "WHERE ul.user_id IN (? , ?) " +
+                        "GROUP BY f.film_id " +
+                        "HAVING COUNT(DISTINCT ul.user_id) = 2";
+
+        return jdbcTemplate.query(sql, rs -> {
+            List<Film> result = new ArrayList<>();
+            while (rs.next()) {
+                Film film = makeFilm(rs);
+                film.setMpa(makeMpa(rs));
+                result.add(film);
+            }
+            return result;
+
+        }, userId, friendId);
+    }
 }
