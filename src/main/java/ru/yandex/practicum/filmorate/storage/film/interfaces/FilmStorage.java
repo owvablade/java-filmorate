@@ -16,4 +16,6 @@ public interface FilmStorage {
     Film delete(Film film);
 
     List<Film> getAll();
+
+    List<Film> getCommonFilms(Long userId, Long friendId);
 }
