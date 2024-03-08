@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
 import java.util.*;
 
 @Component
+@Deprecated
 public class InMemoryFilmStorage implements FilmStorage {
 
     private long id = 1;
