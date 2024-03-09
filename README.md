@@ -76,3 +76,6 @@ WHERE source_user_id = ?
   AND uf.target_user_id != ?
 ORDER BY user_id;
 ```
+## Реализация добавления режиссёров в фильмы в ветке add-director
+### Схема БД
+![ER-диаграмма БД для ветки add-director](/assets/images/Filmorate_ER_DB_add-director.png)

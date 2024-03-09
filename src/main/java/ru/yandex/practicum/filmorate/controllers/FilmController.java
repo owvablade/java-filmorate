@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.director.DirectorService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import javax.validation.Valid;
@@ -19,6 +20,7 @@ import java.util.List;
 public class FilmController {
 
     private final FilmService filmService;
+    private final DirectorService directorService;
 
     @GetMapping("/{id}")
     public Film get(@PathVariable Long id) {
@@ -57,7 +59,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopular(
+    public List<Film> getTopNPopular(
             @RequestParam(defaultValue = "10")
             @Positive(message = "Parameter count must be positive")
             Integer count) {
@@ -68,5 +70,11 @@ public class FilmController {
     @GetMapping
     public List<Film> getAll() {
         return filmService.getAllFilms();
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getByDirector(@PathVariable Integer directorId, @RequestParam String sortBy) {
+        directorService.readDirector(directorId);
+        return filmService.getAllByDirector(directorId, sortBy);
     }
 }

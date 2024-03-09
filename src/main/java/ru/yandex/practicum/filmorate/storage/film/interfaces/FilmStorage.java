@@ -16,4 +16,8 @@ public interface FilmStorage {
     boolean delete(Long id);
 
     List<Film> getAll();
+
+    List<Film> getTopNPopular(int n);
+
+    List<Film> getAllByDirector(Integer directorId, String sort);
 }
