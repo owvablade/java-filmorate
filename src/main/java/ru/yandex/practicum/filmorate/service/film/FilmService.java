@@ -70,7 +70,11 @@ public class FilmService {
     }
 
     public List<Film> getTopNFilmsByLikes(int n) {
-        return likesStorage.getNPopular(n);
+        return filmStorage.getTopNPopular(n);
+    }
+
+    public List<Film> getAllByDirector(Integer directorId, String sort) {
+        return filmStorage.getAllByDirector(directorId, sort);
     }
 
     public List<Film> getAllFilms() {
