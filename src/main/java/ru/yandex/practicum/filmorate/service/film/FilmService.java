@@ -106,4 +106,8 @@ public class FilmService {
                 .limit(limit)
                 .collect(Collectors.toList());
     }
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
 }
