@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.storage.friends.interfaces.FriendStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -30,16 +31,25 @@ public class FriendDaoImpl implements FriendStorage {
 
     @Override
     public List<User> getFriends(Long id) {
-        final String sql = "SELECT u.user_id,\n" +
-                "u.user_email,\n" +
-                "u.user_login,\n" +
-                "u.user_name,\n" +
-                "u.user_birthday\n" +
+        final String sql = "SELECT DISTINCT u.user_id, u.user_email, u.user_login, u.user_name, u.user_birthday \n" +
                 "FROM users_friendship uf\n" +
-                "JOIN users u ON uf.target_user_id = u.user_id\n" +
-                "WHERE source_user_id = ?\n" +
-                "ORDER BY u.user_id;";
-        return jdbcTemplate.query(sql, this::makeUser, id);
+                "JOIN users u ON uf.source_user_id = u.user_id OR uf.target_user_id = u.user_id\n" +
+                "WHERE user_id = ? OR source_user_id = ?\n" +
+                "ORDER BY user_id;";
+        return jdbcTemplate.query(sql, rs -> {
+            if (!rs.isBeforeFirst()) {
+                return null;
+            }
+            List<User> result = new ArrayList<>();
+            while (rs.next()) {
+                long currentId = rs.getLong("user_id");
+                if (currentId == id) {
+                    continue;
+                }
+                result.add(makeUser(rs, rs.getRow()));
+            }
+            return result;
+        }, id, id);
     }
 
     @Override
