@@ -48,4 +48,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Film> getAll() {
         return new ArrayList<>(filmStorage.values());
     }
+
+    @Override
+    public List<Film> getTopNPopular(int n) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getAllByDirector(Integer directorId, String sort) {
+        return null;
+    }
 }

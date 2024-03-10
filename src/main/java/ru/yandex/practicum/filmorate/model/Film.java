@@ -34,6 +34,7 @@ public class Film {
     private Integer duration;
     private Mpa mpa;
     private List<Genre> genres = new ArrayList<>();
+    private List<Director> directors = new ArrayList<>();
     @Setter(AccessLevel.NONE)
     private Set<Long> likes = new HashSet<>();
 
@@ -59,6 +60,10 @@ public class Film {
 
     public boolean containsGenre(Genre genre) {
         return genres.contains(genre);
+    }
+
+    public void addDirector(Director director) {
+        directors.add(director);
     }
 
     public int getLikesCount() {
