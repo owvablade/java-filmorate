@@ -48,4 +48,9 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> getAll() {
         return new ArrayList<>(userStorage.values());
     }
+
+    @Override
+    public Set<Long> getRecommendedFilmsForUser(Long userId) {
+        return null;
+    }
 }

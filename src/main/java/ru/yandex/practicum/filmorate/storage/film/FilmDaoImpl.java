@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Component("filmDaoImpl")
 @RequiredArgsConstructor
+
 public class FilmDaoImpl implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
@@ -183,4 +184,5 @@ public class FilmDaoImpl implements FilmStorage {
         jdbcTemplate.update(deleteGenresSql, film.getId());
         addGenres(film);
     }
+
 }
