@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -67,10 +68,9 @@ public class UserController {
     }
 
     @GetMapping("users/{id}/recommendations")
-    public List<Film> getRecommendedFilmsForUser (Long id) {
-        log.info("Invoke get films");//дописать
-        throw new RuntimeException("Обработка запроса не реализована");
-        //return userService.getRecommendedFilmsForUser(id);
+    public Set<Film> getRecommendedFilmsForUser (Long id) {
+        log.info("Invoke get recommendations of films for user.");
+        return userService.getRecommendedFilmsForUser(id);
     }
 
     @GetMapping

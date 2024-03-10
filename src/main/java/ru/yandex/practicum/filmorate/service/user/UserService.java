@@ -7,11 +7,17 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.user.UserCannotBefriendHimselfException;
 import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreAlreadyFriendsException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.storage.friends.interfaces.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +25,9 @@ public class UserService {
 
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
+
+    private final FilmService filmService;
+
 
     public User createUser(User user) {
         checkUserName(user);
@@ -84,4 +93,10 @@ public class UserService {
         }
     }
 
+    public Set<Film> getRecommendedFilmsForUser(Long id) {
+        Set<Long> recommendedFilmsIds = userStorage.getRecommendedFilmsForUser(id);
+        return recommendedFilmsIds.stream()
+                .map(filmService::readFilm)
+                .collect(Collectors.toSet());
+    }
 }
