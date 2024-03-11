@@ -67,7 +67,7 @@ public class UserController {
         return userService.getCommonFriends(id, otherId);
     }
 
-    @GetMapping("users/{id}/recommendations")
+    @GetMapping("/{id}/recommendations")
     public Set<Film> getRecommendedFilmsForUser(@PathVariable Long id) {
         log.info("Invoke get recommendations of films for user.");
         return userService.getRecommendedFilmsForUser(id);
