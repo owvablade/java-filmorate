@@ -55,11 +55,10 @@ public class UserService {
         return user;
     }
 
-    public User deleteUser(User user) {
-        if (userStorage.delete(user) == null) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", user.getId()));
+    public void deleteUser(Long userId) {
+        if (!userStorage.delete(userId)) {
+            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
         }
-        return user;
     }
 
     public void addFriend(Long userId, Long friendId) {
