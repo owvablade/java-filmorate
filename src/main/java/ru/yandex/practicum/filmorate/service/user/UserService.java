@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service.user;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserStorage userStorage;
@@ -28,6 +28,14 @@ public class UserService {
 
     private final FilmService filmService;
 
+    @Autowired
+    public UserService(@Qualifier("userDaoImpl") UserStorage userStorage,
+                       FriendStorage friendStorage,
+                       FilmService filmService) {
+        this.userStorage = userStorage;
+        this.friendStorage = friendStorage;
+        this.filmService = filmService;
+    }
 
     public User createUser(User user) {
         checkUserName(user);
@@ -47,10 +55,11 @@ public class UserService {
         return user;
     }
 
-    public void deleteUser(Long userId) {
-        if (!userStorage.delete(userId)) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
+    public User deleteUser(User user) {
+        if (userStorage.delete(user) == null) {
+            throw new UserNotFoundException(String.format("User with id = %d not found", user.getId()));
         }
+        return user;
     }
 
     public void addFriend(Long userId, Long friendId) {
@@ -72,11 +81,7 @@ public class UserService {
     }
 
     public List<User> getUserFriends(Long userId) {
-        List<User> result = friendStorage.getFriends(userId);
-        if (result == null) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
-        }
-        return result;
+        return new ArrayList<>(friendStorage.getFriends(userId));
     }
 
     public List<User> getCommonFriends(Long userId, Long otherId) {
