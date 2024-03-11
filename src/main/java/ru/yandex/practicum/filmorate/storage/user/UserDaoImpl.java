@@ -102,6 +102,9 @@ public class UserDaoImpl implements UserStorage {
                 userIdMax = entry.getKey();
             }
         }
+        if (userIdMax == null) {
+            return new HashSet<>();
+        }
         Set<Long> maxIntersectionUserLikes = allUsersLikes.get(userIdMax);
         Set<Long> intersection = getIntersectionSize(userLikes, maxIntersectionUserLikes);
         maxIntersectionUserLikes.removeAll(intersection);
