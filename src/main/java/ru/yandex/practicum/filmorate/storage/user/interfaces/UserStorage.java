@@ -17,5 +17,6 @@ public interface UserStorage {
     boolean delete(Long id);
 
     List<User> getAll();
+
     Set<Long> getRecommendedFilmsForUser(Long userId);
 }
