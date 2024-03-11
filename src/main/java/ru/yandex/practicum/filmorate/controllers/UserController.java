@@ -68,7 +68,7 @@ public class UserController {
     }
 
     @GetMapping("users/{id}/recommendations")
-    public Set<Film> getRecommendedFilmsForUser(Long id) {
+    public Set<Film> getRecommendedFilmsForUser(@PathVariable Long id) {
         log.info("Invoke get recommendations of films for user.");
         return userService.getRecommendedFilmsForUser(id);
     }
