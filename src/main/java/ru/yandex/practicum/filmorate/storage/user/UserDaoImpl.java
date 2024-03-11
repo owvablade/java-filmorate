@@ -86,8 +86,9 @@ public class UserDaoImpl implements UserStorage {
         String sqlGetUser = "SELECT user_id, film_id " +
                 "FROM users_likes;";
         Map<Long, Set<Long>> allUsersLikes = jdbcTemplate.query(sqlGetUser, this::mapUsersLikes);
-        if (allUsersLikes == null || allUsersLikes.isEmpty())
-            throw new NoSuchElementException("Лайки отсутствуют");
+        if (allUsersLikes == null || allUsersLikes.isEmpty()) {
+            return new HashSet<>();
+        }
 
         Set<Long> userLikes = allUsersLikes.get(userId);
         allUsersLikes.remove(userId);
