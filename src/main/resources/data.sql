@@ -30,3 +30,15 @@ ON g.genre_id = t.genre_id
 WHEN NOT MATCHED THEN
     INSERT (genre_id, genre_name)
     VALUES (t.genre_id, t.genre_name);
+
+    INSERT INTO event_type (event_type_id, name)
+                  VALUES (1, 'LIKE'),
+                         (2, 'REVIEW'),
+                         (3, 'FRIEND');
+
+INSERT INTO event_operation (event_operation_id, name)
+                  VALUES (1, 'ADD'),
+                         (2, 'UPDATE'),
+                         (3, 'REMOVE');
+
+
