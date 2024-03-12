@@ -16,6 +16,7 @@ import ru.yandex.practicum.filmorate.exception.film.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.genre.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.exception.like.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.exception.mpa.MpaNotFoundException;
+import ru.yandex.practicum.filmorate.exception.review.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreAlreadyFriendsException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreNotFriendsException;
@@ -77,7 +78,8 @@ public class ErrorHandler {
     @ExceptionHandler({GenreNotFoundException.class,
             LikeNotFoundException.class,
             MpaNotFoundException.class,
-            DirectorNotFoundException.class})
+            DirectorNotFoundException.class,
+            ReviewNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleObjectNotFoundInDbException(final RuntimeException e) {
         log.error("Object in database not found", e);

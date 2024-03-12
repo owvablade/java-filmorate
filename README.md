@@ -79,3 +79,6 @@ ORDER BY user_id;
 ## Реализация добавления режиссёров в фильмы в ветке add-director
 ### Схема БД
 ![ER-диаграмма БД для ветки add-director](/assets/images/Filmorate_ER_DB_add-director.png)
+## Реализация добавления отзывов в фильмы в ветке add-reviews
+### Схема БД
+![ER-диаграмма БД для ветки add-reviews](/assets/images/Filmorate_ER_DB_add-reviews.png)
