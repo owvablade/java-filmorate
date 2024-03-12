@@ -1,24 +1,41 @@
 package ru.yandex.practicum.filmorate.service.user;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.user.UserCannotBefriendHimselfException;
 import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreAlreadyFriendsException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.storage.friends.interfaces.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
+
+    private final FilmService filmService;
+
+    @Autowired
+    public UserService(@Qualifier("userDaoImpl") UserStorage userStorage,
+                       FriendStorage friendStorage,
+                       FilmService filmService) {
+        this.userStorage = userStorage;
+        this.friendStorage = friendStorage;
+        this.filmService = filmService;
+    }
 
     public User createUser(User user) {
         checkUserName(user);
@@ -63,11 +80,7 @@ public class UserService {
     }
 
     public List<User> getUserFriends(Long userId) {
-        List<User> result = friendStorage.getFriends(userId);
-        if (result == null) {
-            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
-        }
-        return result;
+        return new ArrayList<>(friendStorage.getFriends(userId));
     }
 
     public List<User> getCommonFriends(Long userId, Long otherId) {
@@ -82,5 +95,12 @@ public class UserService {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
+    }
+
+    public Set<Film> getRecommendedFilmsForUser(Long id) {
+        Set<Long> recommendedFilmsIds = userStorage.getRecommendedFilmsForUser(id);
+        return recommendedFilmsIds.stream()
+                .map(filmService::readFilm)
+                .collect(Collectors.toSet());
     }
 }
