@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+
 @Data
 @NoArgsConstructor
 public class Event {
@@ -17,12 +19,11 @@ public class Event {
     private long id;
     private long entityId;
 
-    public Event(long timeAdd, long userId, EventType eventType, EventOperation eventOperation, long id, long entityId) {
-        this.timeAdd = timeAdd;
+    public Event(long userId, EventType eventType, EventOperation eventOperation,long entityId) {
+        this.timeAdd = new Timestamp(System.currentTimeMillis()).getTime();
         this.userId = userId;
         this.eventType = eventType;
         this.eventOperation = eventOperation;
-        this.id = id;
         this.entityId = entityId;
     }
 }
