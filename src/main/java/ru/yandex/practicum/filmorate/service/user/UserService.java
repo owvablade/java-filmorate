@@ -77,7 +77,11 @@ public class UserService {
     }
 
     public List<User> getUserFriends(Long userId) {
-        return new ArrayList<>(friendStorage.getFriends(userId));
+        List<User> result = friendStorage.getFriends(userId);
+        if (result == null) {
+            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
+        }
+        return result;
     }
 
     public List<User> getCommonFriends(Long userId, Long otherId) {
