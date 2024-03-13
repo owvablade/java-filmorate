@@ -8,7 +8,7 @@ public enum EventType {
     FRIEND(3);
 
     @Getter
-    private final  int id;
+    private final int id;
 
     EventType(int id) {
         this.id = id;

@@ -15,9 +15,9 @@ import java.util.List;
 @Repository
 public class EventDbStorage implements EventStorage {
 
-   private final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
-   private final UserStorage userStorage;
+    private final UserStorage userStorage;
 
     public EventDbStorage(JdbcTemplate jdbcTemplate, UserStorage userStorage) {
         this.jdbcTemplate = jdbcTemplate;
@@ -48,6 +48,7 @@ public class EventDbStorage implements EventStorage {
                 "WHERE UE.USER_ID=?";
         return jdbcTemplate.query(sql, this::makeEvent, userId);
     }
+
     private Event makeEvent(ResultSet rs, int i) throws SQLException {
         Event event = new Event();
         event.setId(rs.getLong("event_id"));
