@@ -65,13 +65,12 @@ public class FilmService {
 
     public void deleteLike(Long filmId, Long userId) {
         if (likesStorage.deleteLike(filmId, userId) == 0) {
-            throw new LikeNotFoundException(String.format(
-                    "Like from user with id=%d was not found on film with id=%d. Or vice versa", userId, filmId));
-        } else
+            throw new LikeNotFoundException(String.format("Like from user with id=%d was not found on film with id=%d. Or vice versa", userId, filmId));
+        } else {
             likesStorage.deleteLike(filmId, userId);
             Event event = new Event(userId, EventType.LIKE, EventOperation.REMOVE, filmId);
             eventService.addEvent(event);
-
+        }
     }
 
     public List<Film> getAllFilms() {

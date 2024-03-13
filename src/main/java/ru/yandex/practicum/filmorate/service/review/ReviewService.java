@@ -35,7 +35,7 @@ public class ReviewService {
         Review review1 = reviewStorage.create(review);
         Event event = new Event(review1.getUserId(), EventType.REVIEW, EventOperation.ADD, review1.getReviewId());
         eventService.addEvent(event);
-        return reviewStorage.create(review);
+        return review1;
     }
 
     public Review getReview(Long id) {
@@ -55,6 +55,13 @@ public class ReviewService {
     }
 
     public void deleteReview(Long id) {
+        Review review = reviewStorage.read(id)
+                .orElseThrow(() -> new ReviewNotFoundException(String.format("Review with id = %d not found", id)));
+
+        long userId = review.getUserId();
+        Event event = new Event(userId, EventType.REVIEW, EventOperation.REMOVE, id);
+        eventService.addEvent(event);
+
         if (!reviewStorage.delete(id)) {
             throw new ReviewNotFoundException(String.format("Review with id = %d not found", id));
         }
