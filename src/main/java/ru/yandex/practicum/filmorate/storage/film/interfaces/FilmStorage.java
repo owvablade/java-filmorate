@@ -22,4 +22,6 @@ public interface FilmStorage {
     List<Film> getTopNPopular(int n);
 
     List<Film> getAllByDirector(Integer directorId, String sort);
+
+    List<Film> getFilmBySearch(String query, String by);
 }

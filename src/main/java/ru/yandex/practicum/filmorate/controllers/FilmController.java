@@ -89,4 +89,13 @@ public class FilmController {
         directorService.readDirector(directorId);
         return filmService.getAllByDirector(directorId, sortBy);
     }
+
+    @GetMapping("/search")
+    public List<Film> searchFilms(
+            @RequestParam(value = "query", defaultValue = "unknown") String query,
+            @RequestParam(value = "by", defaultValue = "unknown") String by) {
+        log.info("GET запрос на получение списка " +
+                "популярных фильмов расширенного поиска параметрами: QUERY = {}, BY = {}.", query, by);
+        return filmService.searchFilms(query, by);
+    }
 }

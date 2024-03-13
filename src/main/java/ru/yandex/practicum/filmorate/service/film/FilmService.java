@@ -110,4 +110,11 @@ public class FilmService {
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         return filmStorage.getCommonFilms(userId, friendId);
     }
+
+    public List<Film> searchFilms(String query, String by) {
+        if (!(by.contains("title") || by.contains("director") || by.contains("title,director") || by.contains("director,title") || by.contains("unknown"))) {
+            throw new IllegalArgumentException("Некорректное значение выборки поиска");
+        }
+        return filmStorage.getFilmBySearch(query, by);
+    }
 }

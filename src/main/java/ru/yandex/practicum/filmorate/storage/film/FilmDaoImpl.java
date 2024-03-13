@@ -349,5 +349,38 @@ public class FilmDaoImpl implements FilmStorage {
         }
     }
 
-
+    @Override
+    public List<Film> getFilmBySearch(String query, String by) {
+        StringBuilder sql = new StringBuilder("SELECT "
+                + "f.film_id,"
+                + "f.film_name,"
+                + "f.film_description,"
+                + "f.film_release_date,"
+                + "f.film_duration,"
+                + "f.mpa_rating_id,"
+                + "m.mpa_rating_name, "
+                + "LISTAGG(DISTINCT g.genre_id, ',') WITHIN GROUP (ORDER BY g.genre_id) AS genre_id, "
+                + "LISTAGG(DISTINCT g.genre_name, ',') WITHIN GROUP (ORDER BY g.genre_id) AS genre_name, "
+                + "LISTAGG(DISTINCT d.director_id, ',') WITHIN GROUP (ORDER BY d.director_id) AS director_id, "
+                + "LISTAGG(DISTINCT d.director_name, ',') WITHIN GROUP (ORDER BY d.director_id) AS director_name "
+                + "FROM films f "
+                + "LEFT JOIN users_likes ul ON f.film_id = ul.film_id "
+                + "LEFT JOIN mpa_rating m ON m.mpa_rating_id = f.mpa_rating_id "
+                + "LEFT JOIN films_director fd ON f.film_id = fd.film_id "
+                + "LEFT JOIN directors d ON fd.director_id = d.director_id "
+                + "LEFT JOIN films_genre fg ON f.film_id = fg.film_id "
+                + "LEFT JOIN genre g ON fg.genre_id = g.genre_id ");
+        if (by.equals("title")) {
+            sql.append("WHERE LOWER(f.film_name) LIKE LOWER('%").append(query).append("%') ");
+        }
+        if (by.equals("director")) {
+            sql.append("WHERE LOWER(d.director_name) LIKE LOWER('%").append(query).append("%') ");
+        }
+        if (by.equals("title,director") || by.equals("director,title")) {
+            sql.append("WHERE LOWER(f.film_name) LIKE LOWER('%").append(query).append("%') ");
+            sql.append("OR LOWER(d.director_name) LIKE LOWER('%").append(query).append("%') ");
+        }
+        sql.append("GROUP BY f.film_id, ul.film_id " + "ORDER BY COUNT(ul.film_id) DESC;");
+        return jdbcTemplate.query(sql.toString(), this::makeFilm);
+    }
 }
