@@ -17,7 +17,6 @@ import ru.yandex.practicum.filmorate.exception.genre.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.exception.like.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.exception.mpa.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.exception.review.ReviewNotFoundException;
-import ru.yandex.practicum.filmorate.exception.user.UserDoesNotExistException;
 import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreAlreadyFriendsException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreNotFriendsException;
@@ -92,13 +91,6 @@ public class ErrorHandler {
     public ErrorResponse handleThrowable(final Throwable e) {
         log.error("Error", e);
         return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFound(UserDoesNotExistException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
     }
 
 }
