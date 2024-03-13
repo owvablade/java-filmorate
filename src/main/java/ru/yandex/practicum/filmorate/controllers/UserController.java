@@ -87,10 +87,9 @@ public class UserController {
 
     @GetMapping("/{userId}/feed")
     public List<Event> getUserFeed(@NonNull @PathVariable long userId) {
-        try {
-            userService.readUser(userId);
-        } catch (UserNotFoundException e) {
-            throw new UserDoesNotExistException("User with ID " + userId + " does not exist");
+        User user = userService.readUser(userId); // Проверяем существует ли пользователь с данным userId
+        if (user == null) {
+            throw new UserNotFoundException(String.format("User with id = %d not found", userId));
         }
         return eventService.findUserEvent(userId);
     }
