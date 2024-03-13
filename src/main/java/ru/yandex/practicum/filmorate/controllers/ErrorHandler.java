@@ -92,4 +92,5 @@ public class ErrorHandler {
         log.error("Error", e);
         return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
+
 }

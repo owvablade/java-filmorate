@@ -14,6 +14,8 @@ import java.util.Set;
 @Accessors(chain = true)
 public class User {
 
+    @Setter(AccessLevel.NONE)
+    private final Set<Long> friends = new HashSet<>();
     private Long id;
     @Email(message = "Invalid email")
     @NotBlank(message = "Email must not be blank")
@@ -26,8 +28,6 @@ public class User {
     @NotNull
     @PastOrPresent(message = "Date of birth must be earlier than today")
     private LocalDate birthday;
-    @Setter(AccessLevel.NONE)
-    private final Set<Long> friends = new HashSet<>();
 
     public User setLogin(String login) {
         if (this.name == null || this.name.isBlank()) {
