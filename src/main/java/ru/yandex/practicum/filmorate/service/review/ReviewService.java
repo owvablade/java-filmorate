@@ -27,7 +27,7 @@ public class ReviewService {
     private final EventService eventService;
 
 
-    public Review createReview(Review review) {
+    public Review createdReview(Review review) {
         userStorage.read(review.getUserId()).orElseThrow(() ->
                 new UserNotFoundException(String.format("User with id=%d not found", review.getUserId())));
         filmStorage.read(review.getFilmId()).orElseThrow(() ->

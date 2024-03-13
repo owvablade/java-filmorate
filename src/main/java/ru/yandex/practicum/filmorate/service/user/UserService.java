@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.service.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -31,17 +29,6 @@ public class UserService {
     private final FilmService filmService;
 
     private final EventService eventService;
-
-
- /*   @Autowired
-    public UserService(@Qualifier("userDaoImpl") UserStorage userStorage,
-                       FriendStorage friendStorage,
-                       FilmService filmService, EventService eventService) {
-        this.userStorage = userStorage;
-        this.friendStorage = friendStorage;
-        this.filmService = filmService;
-        this.eventService = eventService;
-    }*/
 
     public User createUser(User user) {
         checkUserName(user);
