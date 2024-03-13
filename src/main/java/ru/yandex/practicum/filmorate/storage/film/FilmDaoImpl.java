@@ -349,5 +349,25 @@ public class FilmDaoImpl implements FilmStorage {
         }
     }
 
-
+    @Override
+    public List<Film> getFilmBySearch(String query, String by) {
+        StringBuilder sql = new StringBuilder("SELECT f.* "
+                + "FROM films f "
+                + "LEFT JOIN users_likes ul ON f.film_id = ul.film_id "
+                + "LEFT JOIN mpa_rating m ON m.mpa_rating_id = f.mpa_rating_id "
+                + "LEFT JOIN films_director fd ON f.film_id = fd.film_id "
+                + "LEFT JOIN directors d ON fd.director_id = d.director_id ");
+        if (by.equals("title")) {
+            sql.append("WHERE LOWER(f.film_name) LIKE LOWER('%").append(query).append("%') ");
+        }
+        if (by.equals("director")) {
+            sql.append("WHERE LOWER(d.director_name) LIKE LOWER('%").append(query).append("%') ");
+        }
+        if (by.equals("title,director") || by.equals("director,title")) {
+            sql.append("WHERE LOWER(f.film_name) LIKE LOWER('%").append(query).append("%') ");
+            sql.append("OR LOWER(d.director_name) LIKE LOWER('%").append(query).append("%') ");
+        }
+        sql.append("GROUP BY f.film_id, ul.film_id " + "ORDER BY COUNT(ul.film_id) DESC;");
+        return jdbcTemplate.query(sql.toString(), this::makeFilm);
+    }
 }
