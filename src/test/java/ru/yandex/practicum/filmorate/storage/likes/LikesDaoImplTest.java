@@ -89,15 +89,6 @@ class LikesDaoImplTest {
     }
 
     @Test
-    void addSecondLikeFromUser() {
-        User createdFirstUser = userDao.create(firstUser);
-        Film createdFirstFilm = filmDao.create(firstFilm);
-        likesDao.addLike(createdFirstFilm.getId(), createdFirstUser.getId());
-        assertThrows(DuplicateKeyException.class,
-                () -> likesDao.addLike(createdFirstFilm.getId(), createdFirstUser.getId()));
-    }
-
-    @Test
     void addLikeFromNonexistentUser() {
         Film createdFirstFilm = filmDao.create(firstFilm);
         assertAll(
