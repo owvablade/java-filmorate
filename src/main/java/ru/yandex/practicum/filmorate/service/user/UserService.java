@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service.user;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserStorage userStorage;
@@ -31,7 +33,7 @@ public class UserService {
     private final EventService eventService;
 
 
-    @Autowired
+ /*   @Autowired
     public UserService(@Qualifier("userDaoImpl") UserStorage userStorage,
                        FriendStorage friendStorage,
                        FilmService filmService, EventService eventService) {
@@ -39,7 +41,7 @@ public class UserService {
         this.friendStorage = friendStorage;
         this.filmService = filmService;
         this.eventService = eventService;
-    }
+    }*/
 
     public User createUser(User user) {
         checkUserName(user);
