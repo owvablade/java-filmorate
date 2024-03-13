@@ -351,12 +351,20 @@ public class FilmDaoImpl implements FilmStorage {
 
     @Override
     public List<Film> getFilmBySearch(String query, String by) {
-        StringBuilder sql = new StringBuilder("SELECT f.* "
+        StringBuilder sql = new StringBuilder("SELECT "
+                + "f.film_id,"
+                + "f.film_name,"
+                + "f.film_description,"
+                + "f.film_release_date,"
+                + "f.film_duration,"
+                + "f.mpa_rating_id,"
+                + "m.mpa_rating_name "
                 + "FROM films f "
                 + "LEFT JOIN users_likes ul ON f.film_id = ul.film_id "
                 + "LEFT JOIN mpa_rating m ON m.mpa_rating_id = f.mpa_rating_id "
                 + "LEFT JOIN films_director fd ON f.film_id = fd.film_id "
-                + "LEFT JOIN directors d ON fd.director_id = d.director_id ");
+                + "LEFT JOIN directors d ON fd.director_id = d.director_id "
+                + "LEFT JOIN films_genre AS fg ON f.film_id = fg.film_id ");
         if (by.equals("title")) {
             sql.append("WHERE LOWER(f.film_name) LIKE LOWER('%").append(query).append("%') ");
         }
