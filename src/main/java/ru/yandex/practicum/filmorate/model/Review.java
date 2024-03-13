@@ -11,21 +11,16 @@ import javax.validation.constraints.NotNull;
 @Data
 public class Review {
 
-    private long reviewId;
-
     @NotBlank(message = "Content must not be blank")
     private final String content;
-
     @Getter(AccessLevel.NONE)
     @NotNull
     private final Boolean isPositive;
-
     @NotNull
     private final Long userId;
-
     @NotNull
     private final Long filmId;
-
+    private long reviewId;
     private int useful;
 
     @JsonProperty(value = "isPositive")
