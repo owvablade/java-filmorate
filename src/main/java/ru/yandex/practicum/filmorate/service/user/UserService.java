@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.user.UserCannotBefriendHimselfException;
 import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreAlreadyFriendsException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.service.event.EventService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.storage.friends.interfaces.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-
 public class UserService {
 
     private final UserStorage userStorage;
@@ -29,13 +28,17 @@ public class UserService {
 
     private final FilmService filmService;
 
+    private final EventService eventService;
+
+
     @Autowired
     public UserService(@Qualifier("userDaoImpl") UserStorage userStorage,
                        FriendStorage friendStorage,
-                       FilmService filmService) {
+                       FilmService filmService, EventService eventService) {
         this.userStorage = userStorage;
         this.friendStorage = friendStorage;
         this.filmService = filmService;
+        this.eventService = eventService;
     }
 
     public User createUser(User user) {
@@ -68,6 +71,8 @@ public class UserService {
         }
         try {
             friendStorage.addFriend(userId, friendId);
+            Event event = new Event(userId, EventType.FRIEND, EventOperation.ADD, friendId);
+            eventService.addEvent(event);
         } catch (DuplicateKeyException e) {
             throw new UsersAreAlreadyFriendsException(
                     String.format("User with id %d already has friend with id %d.", userId, friendId), e);
@@ -78,6 +83,8 @@ public class UserService {
 
     public void deleteFriend(Long userId, Long friendId) {
         friendStorage.removeFriend(userId, friendId);
+        Event event = new Event(userId, EventType.FRIEND, EventOperation.REMOVE, friendId);
+        eventService.addEvent(event);
     }
 
     public List<User> getUserFriends(Long userId) {
