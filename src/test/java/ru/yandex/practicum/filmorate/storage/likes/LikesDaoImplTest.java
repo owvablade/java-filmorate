@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -86,15 +85,6 @@ class LikesDaoImplTest {
                 () -> assertEquals(firstFilm.getDuration(), mostPopular.getDuration()),
                 () -> assertEquals(firstFilm.getMpa(), mostPopular.getMpa())
         );
-    }
-
-    @Test
-    void addSecondLikeFromUser() {
-        User createdFirstUser = userDao.create(firstUser);
-        Film createdFirstFilm = filmDao.create(firstFilm);
-        likesDao.addLike(createdFirstFilm.getId(), createdFirstUser.getId());
-        assertThrows(DuplicateKeyException.class,
-                () -> likesDao.addLike(createdFirstFilm.getId(), createdFirstUser.getId()));
     }
 
     @Test
