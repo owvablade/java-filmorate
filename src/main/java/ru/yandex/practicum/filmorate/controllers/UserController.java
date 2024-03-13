@@ -4,6 +4,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.user.UserDoesNotExistException;
+import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -85,6 +87,11 @@ public class UserController {
 
     @GetMapping("/{userId}/feed")
     public List<Event> getUserFeed(@NonNull @PathVariable long userId) {
+        try {
+            userService.readUser(userId);
+        } catch (UserNotFoundException e) {
+            throw new UserDoesNotExistException("User with ID " + userId + " does not exist");
+        }
         return eventService.findUserEvent(userId);
     }
 }
