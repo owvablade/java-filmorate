@@ -27,15 +27,15 @@ public class ReviewService {
     private final EventService eventService;
 
 
-    public Review createdReview(Review review) {
+    public Review createReview(Review review) {
         userStorage.read(review.getUserId()).orElseThrow(() ->
                 new UserNotFoundException(String.format("User with id=%d not found", review.getUserId())));
         filmStorage.read(review.getFilmId()).orElseThrow(() ->
                 new FilmNotFoundException(String.format("Film with id=%d not found", review.getFilmId())));
-        Review review1 = reviewStorage.create(review);
-        Event event = new Event(review1.getUserId(), EventType.REVIEW, EventOperation.ADD, review1.getReviewId());
+        Review createdReview = reviewStorage.create(review);
+        Event event = new Event(createdReview.getUserId(), EventType.REVIEW, EventOperation.ADD, createdReview.getReviewId());
         eventService.addEvent(event);
-        return review1;
+        return createdReview;
     }
 
     public Review getReview(Long id) {

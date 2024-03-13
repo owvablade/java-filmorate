@@ -20,7 +20,7 @@ public class ReviewController {
     @PostMapping
     public Review createReview(@Valid @RequestBody Review review) {
         log.info("Invoke post review method at resource POST /reviews={}", review);
-        return reviewService.createdReview(review);
+        return reviewService.createReview(review);
     }
 
     @GetMapping("/{id}")
