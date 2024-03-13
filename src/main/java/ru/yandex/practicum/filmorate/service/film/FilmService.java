@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.film.FilmAlreadyLikedByUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.like.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
@@ -54,9 +52,6 @@ public class FilmService {
             likesStorage.addLike(filmId, userId);
             Event event = new Event(userId, EventType.LIKE, EventOperation.ADD, filmId);
             eventService.addEvent(event);
-        } catch (DuplicateKeyException e) {
-            throw new FilmAlreadyLikedByUserException(
-                    String.format("User with id %d has already liked film with id %d.", userId, filmId), e);
         } catch (DataIntegrityViolationException e) {
             throw new FilmNotFoundException(
                     String.format("User with id %d or film with id %d not found.", userId, filmId), e);

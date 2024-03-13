@@ -13,7 +13,12 @@ public class LikesDaoImpl implements LikesStorage {
 
     @Override
     public void addLike(Long filmId, Long userId) {
-        final String sql = "INSERT INTO users_likes (user_id, film_id) VALUES (?, ?);";
+        final String sql = "MERGE INTO users_likes ul\n" +
+                "USING (VALUES (?, ?)) AS t (user_id, film_id) \n" +
+                "ON ul.user_id = t.user_id AND ul.film_id = t.film_id\n" +
+                "WHEN NOT MATCHED THEN\n" +
+                "INSERT (user_id, film_id)\n" +
+                "VALUES (t.user_id, t.film_id);";
         jdbcTemplate.update(sql, userId, filmId);
     }
 

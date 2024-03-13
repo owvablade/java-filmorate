@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.yandex.practicum.filmorate.exception.director.DirectorNotFoundException;
-import ru.yandex.practicum.filmorate.exception.film.FilmAlreadyLikedByUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmHasNoLikeFromUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.genre.GenreNotFoundException;
@@ -67,8 +66,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({FilmNotFoundException.class,
-            FilmHasNoLikeFromUserException.class,
-            FilmAlreadyLikedByUserException.class})
+            FilmHasNoLikeFromUserException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleFilmException(final RuntimeException e) {
         log.error("Film error", e);
