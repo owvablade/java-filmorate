@@ -72,7 +72,7 @@ class LikesDaoImplTest {
 
         likesDao.addLike(createdFirstFilm.getId(), createdFirstUser.getId());
         likesDao.addLike(createdFirstFilm.getId(), createdSecondUser.getId());
-        List<Film> actualResult = filmDao.getTopNPopular(2);
+        List<Film> actualResult = filmDao.getMostNPopular(2);
         Film mostPopular = actualResult.get(0);
 
         assertNotNull(actualResult);
@@ -121,7 +121,7 @@ class LikesDaoImplTest {
         likesDao.addLike(createdFirstFilm.getId(), createdFirstUser.getId());
         likesDao.addLike(createdSecondFilm.getId(), createdSecondUser.getId());
         likesDao.deleteLike(createdSecondFilm.getId(), createdSecondUser.getId());
-        List<Film> actualResult = filmDao.getTopNPopular(2);
+        List<Film> actualResult = filmDao.getMostNPopular(2);
         Film mostPopular = actualResult.get(0);
 
         assertNotNull(actualResult);
@@ -159,7 +159,7 @@ class LikesDaoImplTest {
 
     @Test
     void getTopNFilms() {
-        assertEquals(0, filmDao.getTopNPopular(50).size());
+        assertEquals(0, filmDao.getMostNPopular(50).size());
 
         final int expectedResultSize = 2;
         User createdFirstUser = userDao.create(firstUser);
@@ -170,7 +170,7 @@ class LikesDaoImplTest {
         likesDao.addLike(createdFirstFilm.getId(), createdSecondUser.getId());
         likesDao.addLike(createdSecondFilm.getId(), createdSecondUser.getId());
 
-        List<Film> actualResult = filmDao.getTopNPopular(2);
+        List<Film> actualResult = filmDao.getMostNPopular(2);
         Film mostPopular = actualResult.get(0);
         assertNotNull(actualResult);
         assertAll(

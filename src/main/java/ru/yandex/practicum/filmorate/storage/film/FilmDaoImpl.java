@@ -143,7 +143,7 @@ public class FilmDaoImpl implements FilmStorage {
         return jdbcTemplate.query(sql, this::makeFilm);
     }
 
-    public List<Film> getTopNPopular(int n) {
+    public List<Film> getMostNPopular(int n) {
         final String sql = "SELECT f.film_id,\n" +
                 "f.film_name,\n" +
                 "f.film_description,\n" +
@@ -167,6 +167,49 @@ public class FilmDaoImpl implements FilmStorage {
                 "ORDER BY cnt DESC\n" +
                 "LIMIT ?;";
         return jdbcTemplate.query(sql, this::makeFilm, n);
+    }
+
+    @Override
+    public List<Film> getMostNPopularBy(int n, String genreId, String year) {
+        final String genreIdForSqlQuery = "%" + genreId + "%";
+        final String byYearSql = "WHERE EXTRACT(YEAR FROM f.film_release_date) = ?\n";
+        final String byGenreIdSql = "HAVING LISTAGG(DISTINCT g.genre_id, ',') LIKE ?\n";
+        final String sql = "SELECT f.film_id,\n" +
+                "f.film_name,\n" +
+                "f.film_description,\n" +
+                "f.film_release_date,\n" +
+                "f.film_duration,\n" +
+                "f.mpa_rating_id,\n" +
+                "mr.mpa_rating_name,\n" +
+                "LISTAGG(DISTINCT g.genre_id, ',') WITHIN GROUP (ORDER BY g.genre_id) AS genre_id,\n" +
+                "LISTAGG(DISTINCT g.genre_name, ',') WITHIN GROUP (ORDER BY g.genre_id) AS genre_name,\n" +
+                "LISTAGG(DISTINCT d.director_id, ',') WITHIN GROUP (ORDER BY d.director_id) AS director_id,\n" +
+                "LISTAGG(DISTINCT d.director_name, ',') WITHIN GROUP (ORDER BY d.director_id) AS director_name\n" +
+                "FROM films f\n" +
+                "LEFT JOIN users_likes AS ul ON f.film_id = ul.film_id\n" +
+                "LEFT JOIN mpa_rating AS mr ON f.mpa_rating_id = mr.mpa_rating_id\n" +
+                "LEFT JOIN films_genre AS fg ON f.film_id = fg.film_id\n" +
+                "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id\n" +
+                "LEFT JOIN films_director AS fd ON fd.film_id = f.film_id\n" +
+                "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
+                "%s" +
+                "GROUP BY f.film_id\n" +
+                "%s" +
+                "ORDER BY COUNT(DISTINCT ul.user_id) DESC\n" +
+                "LIMIT ?;";
+        if (genreId != null && year != null) {
+            return jdbcTemplate.query(String.format(sql, byYearSql, byGenreIdSql),
+                    this::makeFilm,
+                    year, genreIdForSqlQuery, n);
+        } else if (genreId != null) {
+            return jdbcTemplate.query(String.format(sql, "", byGenreIdSql),
+                    this::makeFilm,
+                    genreIdForSqlQuery, n);
+        } else {
+            return jdbcTemplate.query(String.format(sql, byYearSql, ""),
+                    this::makeFilm,
+                    year, n);
+        }
     }
 
     public List<Film> getAllByDirector(Integer directorId, String sort) {

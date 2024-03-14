@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.likes.interfaces.LikesStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +21,6 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final LikesStorage likesStorage;
-
     private final EventService eventService;
 
     public Film createFilm(Film film) {
@@ -72,45 +70,15 @@ public class FilmService {
         return filmStorage.getAll();
     }
 
-    public List<Film> getTopNFilmsByLikes(int n) {
-        return filmStorage.getTopNPopular(n);
-    }
-
     public List<Film> getAllByDirector(Integer directorId, String sort) {
         return filmStorage.getAllByDirector(directorId, sort);
     }
 
-    public List<Film> getMostPopularByGenreAndYear(String year, String genreId, int limit) {
-        var temp = filmStorage.getAll();
-
-        if (year == null & genreId != null) {
-            final int genId = Integer.parseInt(genreId);
-            return temp.stream()
-                    .filter(film ->
-                            film.getGenres()
-                                    .stream()
-                                    .anyMatch(genre -> genre.getId() == genId))
-                    .limit(limit)
-                    .collect(Collectors.toList());
-        } else if (year != null & genreId == null) {
-            final int yearInt = Integer.parseInt(year);
-            return temp.stream()
-                    .filter(film -> film.getReleaseDate().getYear() == yearInt)
-                    .limit(limit)
-                    .collect(Collectors.toList());
+    public List<Film> getMostPopularBy(Integer count, String genreId, String year) {
+        if (year == null && genreId == null) {
+            return filmStorage.getMostNPopular(count);
         }
-
-        final int genId = Integer.parseInt(genreId);
-        final int yearInt = Integer.parseInt(year);
-
-        return temp.stream()
-                .filter(film -> film.getReleaseDate().getYear() == yearInt)
-                .filter(film ->
-                        film.getGenres()
-                                .stream()
-                                .anyMatch(genre -> genre.getId() == genId))
-                .limit(limit)
-                .collect(Collectors.toList());
+        return filmStorage.getMostNPopularBy(count, genreId, year);
     }
 
     public List<Film> getCommonFilms(Long userId, Long friendId) {

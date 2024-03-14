@@ -24,11 +24,9 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserStorage userStorage;
-    private final FriendStorage friendStorage;
-
     private final FilmService filmService;
-
     private final EventService eventService;
+    private final FriendStorage friendStorage;
 
     public User createUser(User user) {
         checkUserName(user);
