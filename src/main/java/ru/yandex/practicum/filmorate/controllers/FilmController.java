@@ -60,17 +60,14 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> getMostPopular(
-            @RequestParam(value = "count", defaultValue = "10") @Positive(message = "Parameter count must be positive") Integer count,
+            @RequestParam(value = "count", defaultValue = "10")
+            @Positive(message = "Parameter count must be positive") Integer count,
             @RequestParam(value = "genreId", required = false) String genreId,
             @RequestParam(value = "year", required = false) String year) {
 
-        log.info("Invoke get most n popular film method at resource GET /films/popular?count={}", count);
-
-        if (genreId == null && year == null) {
-            return filmService.getTopNFilmsByLikes(count);
-        }
-
-        return filmService.getMostPopularByGenreAndYear(year, genreId, count);
+        log.info("Invoke get most n popular film method at resource GET /films/popular?count={}&genreId={}&year={}",
+                count, genreId, year);
+        return filmService.getMostPopularBy(count, genreId, year);
     }
 
     @GetMapping
