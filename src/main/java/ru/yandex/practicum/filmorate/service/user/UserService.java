@@ -36,6 +36,7 @@ public class UserService {
     }
 
     public User readUser(Long userId) {
+
         return userStorage.read(userId)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with id = %d not found", userId)));
     }
