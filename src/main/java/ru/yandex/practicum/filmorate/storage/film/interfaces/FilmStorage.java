@@ -13,7 +13,17 @@ public interface FilmStorage {
 
     Film update(Film film);
 
-    Film delete(Film film);
+    boolean delete(Long id);
 
     List<Film> getAll();
+
+    List<Film> getCommonFilms(Long userId, Long friendId);
+
+    List<Film> getMostNPopular(int n);
+
+    List<Film> getMostNPopularBy(int n, String genreId, String year);
+
+    List<Film> getAllByDirector(Integer directorId, String sort);
+
+    List<Film> getFilmBySearch(String query, String by);
 }

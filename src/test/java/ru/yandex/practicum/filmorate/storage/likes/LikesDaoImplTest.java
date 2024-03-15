@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -73,7 +72,7 @@ class LikesDaoImplTest {
 
         likesDao.addLike(createdFirstFilm.getId(), createdFirstUser.getId());
         likesDao.addLike(createdFirstFilm.getId(), createdSecondUser.getId());
-        List<Film> actualResult = likesDao.getNPopular(2);
+        List<Film> actualResult = filmDao.getMostNPopular(2);
         Film mostPopular = actualResult.get(0);
 
         assertNotNull(actualResult);
@@ -86,15 +85,6 @@ class LikesDaoImplTest {
                 () -> assertEquals(firstFilm.getDuration(), mostPopular.getDuration()),
                 () -> assertEquals(firstFilm.getMpa(), mostPopular.getMpa())
         );
-    }
-
-    @Test
-    void addSecondLikeFromUser() {
-        User createdFirstUser = userDao.create(firstUser);
-        Film createdFirstFilm = filmDao.create(firstFilm);
-        likesDao.addLike(createdFirstFilm.getId(), createdFirstUser.getId());
-        assertThrows(DuplicateKeyException.class,
-                () -> likesDao.addLike(createdFirstFilm.getId(), createdFirstUser.getId()));
     }
 
     @Test
@@ -131,7 +121,7 @@ class LikesDaoImplTest {
         likesDao.addLike(createdFirstFilm.getId(), createdFirstUser.getId());
         likesDao.addLike(createdSecondFilm.getId(), createdSecondUser.getId());
         likesDao.deleteLike(createdSecondFilm.getId(), createdSecondUser.getId());
-        List<Film> actualResult = likesDao.getNPopular(2);
+        List<Film> actualResult = filmDao.getMostNPopular(2);
         Film mostPopular = actualResult.get(0);
 
         assertNotNull(actualResult);
@@ -169,7 +159,7 @@ class LikesDaoImplTest {
 
     @Test
     void getTopNFilms() {
-        assertEquals(0, likesDao.getNPopular(50).size());
+        assertEquals(0, filmDao.getMostNPopular(50).size());
 
         final int expectedResultSize = 2;
         User createdFirstUser = userDao.create(firstUser);
@@ -180,7 +170,7 @@ class LikesDaoImplTest {
         likesDao.addLike(createdFirstFilm.getId(), createdSecondUser.getId());
         likesDao.addLike(createdSecondFilm.getId(), createdSecondUser.getId());
 
-        List<Film> actualResult = likesDao.getNPopular(2);
+        List<Film> actualResult = filmDao.getMostNPopular(2);
         Film mostPopular = actualResult.get(0);
         assertNotNull(actualResult);
         assertAll(

@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.yandex.practicum.filmorate.exception.film.FilmAlreadyLikedByUserException;
+import ru.yandex.practicum.filmorate.exception.director.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.film.FilmHasNoLikeFromUserException;
 import ru.yandex.practicum.filmorate.exception.film.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.genre.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.exception.like.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.exception.mpa.MpaNotFoundException;
+import ru.yandex.practicum.filmorate.exception.review.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreAlreadyFriendsException;
 import ru.yandex.practicum.filmorate.exception.user.UsersAreNotFriendsException;
@@ -65,8 +66,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({FilmNotFoundException.class,
-            FilmHasNoLikeFromUserException.class,
-            FilmAlreadyLikedByUserException.class})
+            FilmHasNoLikeFromUserException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleFilmException(final RuntimeException e) {
         log.error("Film error", e);
@@ -75,9 +75,11 @@ public class ErrorHandler {
 
     @ExceptionHandler({GenreNotFoundException.class,
             LikeNotFoundException.class,
-            MpaNotFoundException.class})
+            MpaNotFoundException.class,
+            DirectorNotFoundException.class,
+            ReviewNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleGenreLikeMpaException(final RuntimeException e) {
+    public ErrorResponse handleObjectNotFoundInDbException(final RuntimeException e) {
         log.error("Object in database not found", e);
         return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
     }
@@ -88,4 +90,5 @@ public class ErrorHandler {
         log.error("Error", e);
         return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
+
 }

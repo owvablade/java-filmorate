@@ -12,12 +12,11 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
-@Component("userDaoImpl")
+@Component
 @RequiredArgsConstructor
+
 public class UserDaoImpl implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
@@ -62,12 +61,9 @@ public class UserDaoImpl implements UserStorage {
     }
 
     @Override
-    public User delete(User user) {
+    public boolean delete(Long id) {
         final String sql = "DELETE FROM users WHERE user_id = ?;";
-        if (jdbcTemplate.update(sql, user.getId()) == 0) {
-            return null;
-        }
-        return user;
+        return jdbcTemplate.update(sql, id) != 0;
     }
 
     @Override
@@ -83,5 +79,55 @@ public class UserDaoImpl implements UserStorage {
                 .setLogin(rs.getString("user_login"))
                 .setName(rs.getString("user_name"))
                 .setBirthday(rs.getDate("user_birthday").toLocalDate());
+    }
+
+    @Override
+    public Set<Long> getRecommendedFilmsForUser(Long userId) {
+        String sqlGetUser = "SELECT user_id, film_id " +
+                "FROM users_likes;";
+        Map<Long, Set<Long>> allUsersLikes = jdbcTemplate.query(sqlGetUser, this::mapUsersLikes);
+        if (allUsersLikes == null || allUsersLikes.isEmpty()) {
+            return new HashSet<>();
+        }
+
+        Set<Long> userLikes = allUsersLikes.get(userId);
+        allUsersLikes.remove(userId);
+
+        int maxIntersectionSize = 0;
+        Long userIdMax = null;
+        for (var entry : allUsersLikes.entrySet()) {
+            Set<Long> otherUserLikes = entry.getValue();
+            int intersectionSize = getIntersectionSize(userLikes, otherUserLikes).size();
+            if (intersectionSize > maxIntersectionSize) {
+                maxIntersectionSize = intersectionSize;
+                userIdMax = entry.getKey();
+            }
+        }
+        if (userIdMax == null) {
+            return new HashSet<>();
+        }
+        Set<Long> maxIntersectionUserLikes = allUsersLikes.get(userIdMax);
+        Set<Long> intersection = getIntersectionSize(userLikes, maxIntersectionUserLikes);
+        maxIntersectionUserLikes.removeAll(intersection);
+        return maxIntersectionUserLikes;
+    }
+
+    private Set<Long> getIntersectionSize(Set<Long> set1, Set<Long> set2) {
+        Set<Long> intersection = new HashSet<>(set1);
+        intersection.retainAll(set2);
+        return intersection;
+    }
+
+    private Map<Long, Set<Long>> mapUsersLikes(ResultSet rs) throws SQLException {
+        Map<Long, Set<Long>> usersMapLikes = new HashMap<>();
+        while (rs.next()) {
+            Long userId = rs.getLong("user_id");
+            Long filmId = rs.getLong("film_id");
+
+            Set<Long> filmIds = usersMapLikes.getOrDefault(userId, new HashSet<>());
+            filmIds.add(filmId);
+            usersMapLikes.put(userId, filmIds);
+        }
+        return usersMapLikes;
     }
 }
